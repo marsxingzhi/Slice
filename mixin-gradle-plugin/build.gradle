@@ -27,7 +27,7 @@ publishing {
             from components.kotlin
             groupId 'com.mars.infra'
             artifactId 'mixin-plugin'
-            version '0.0.4'
+            version '0.0.8'
         }
     }
 }

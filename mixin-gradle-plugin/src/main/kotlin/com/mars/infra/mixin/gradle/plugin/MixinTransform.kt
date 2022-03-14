@@ -2,6 +2,7 @@ package com.mars.infra.mixin.gradle.plugin
 
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
+import com.mars.infra.mixin.gradle.plugin.visitor.MixinClassNode
 import com.mars.infra.mixin.gradle.plugin.visitor.MixinClassVisitor
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
@@ -129,7 +130,6 @@ class MixinTransform : Transform() {
         }
     }
 
-    // 一般地，flag设置为ClassWriter.COMPUTE_FRAMES、ClassReader.SKIP_DEBUG or ClassReader.SKIP_FRAMES
     /**
      * 一般地，flag设置为ClassWriter.COMPUTE_FRAMES、ClassReader.SKIP_DEBUG or ClassReader.SKIP_FRAMES
      * 但是这里如上设置，在编译期出现Type androidx/transition/TransitionSet not present的错误...
@@ -141,8 +141,10 @@ class MixinTransform : Transform() {
         val cw = ClassWriter(cr, 0)
 
         val mixinClassVisitor = MixinClassVisitor(cw)
+
+        val mixinClassNode = MixinClassNode(mixinClassVisitor)
 //        cr.accept(mixinClassVisitor, ClassReader.SKIP_DEBUG or ClassReader.SKIP_FRAMES)
-        cr.accept(mixinClassVisitor, ClassReader.EXPAND_FRAMES)
+        cr.accept(mixinClassNode, ClassReader.EXPAND_FRAMES)
         return cw.toByteArray()
     }
 
