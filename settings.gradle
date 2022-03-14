@@ -1,19 +1,4 @@
-//pluginManagement {
-//    repositories {
-//        gradlePluginPortal()
-//        google()
-//        jcenter()
-//        mavenCentral()
-//    }
-//}
-//dependencyResolutionManagement {
-////    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)  注释掉！
-//    repositories {
-//        google()
-//        jcenter()
-//        mavenCentral()
-//    }
-//}
 rootProject.name = "Mixin"
 include ':app'
 include ':mixin-gradle-plugin'
+include ':lib'

@@ -9,3 +9,4 @@
 .cxx
 local.properties
 mixin-gradle-plugin/build/
+lib/build/

@@ -12,5 +12,6 @@ class MixinPlugin: Plugin<Project> {
     override fun apply(project: Project) {
         println("MixinPlugin---😄")
         val appExtension = project.extensions.getByType(AppExtension::class.java)
+        appExtension.registerTransform(MixinTransform())
     }
 }
