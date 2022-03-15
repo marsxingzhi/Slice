@@ -39,6 +39,8 @@ class MixinTransform : Transform() {
             outputProvider.deleteAll()
         }
 
+        Mixin.collectHookInfo(transformInvocation)
+
         transformInvocation.inputs.forEach {
             it.directoryInputs.forEach { directoryInput ->
                 val output = outputProvider!!.getContentLocation(

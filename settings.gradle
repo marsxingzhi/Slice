@@ -2,3 +2,4 @@ rootProject.name = "Mixin"
 include ':app'
 include ':mixin-gradle-plugin'
 include ':lib'
+include ':mixin-annotations'
