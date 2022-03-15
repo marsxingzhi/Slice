@@ -7,7 +7,7 @@ import com.mars.infra.mixin.annotations.Proxy;
  */
 class Test2 {
 
-    @Proxy(owner = "android/util/Log", name = "e")
+    @Proxy(owner = "android/util/Log", name = "i")
     public static void test(String tag, String msg) {
 
     }

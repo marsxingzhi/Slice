@@ -13,6 +13,15 @@ import java.util.zip.ZipFile
  */
 object Mixin {
 
+    val mixinDataList by lazy {
+        arrayListOf<MixinData>()
+    }
+
+    fun clear() {
+        mixinDataList.clear()
+    }
+
+
     /**
      * 在进行transform之前，需要先获取到Proxy注解标识的内容
      * TODO 将Transform拆分，拆成三个步骤，beforeTransform、transform以及afterTransform

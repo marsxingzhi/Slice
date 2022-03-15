@@ -1,5 +1,7 @@
 package com.mars.infra.mixin.gradle.plugin.visitor
 
+import com.mars.infra.mixin.gradle.plugin.Mixin
+import com.mars.infra.mixin.gradle.plugin.MixinData
 import com.mars.infra.mixin.gradle.plugin.core.MethodTransformer
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.Opcodes
@@ -24,7 +26,10 @@ class MixinClassNode(private val classVisitor: ClassVisitor?) : ClassNode(Opcode
         classVisitor?.let { accept(it) }
     }
 
-    private class MixinMethodTransformer(private val owner: String, methodTransformer: MethodTransformer?) : MethodTransformer(methodTransformer) {
+    private class MixinMethodTransformer(
+        private val owner: String,
+        methodTransformer: MethodTransformer?
+    ) : MethodTransformer(methodTransformer) {
 
         override fun transform(node: MethodNode?) {
             super.transform(node)
@@ -38,11 +43,12 @@ class MixinClassNode(private val classVisitor: ClassVisitor?) : ClassNode(Opcode
                 node.instructions.iterator().forEach {
                     when (it) {
                         is MethodInsnNode -> {
-                            if (it.owner == "android/util/Log" && it.name == "e" && it.desc == "(Ljava/lang/String;Ljava/lang/String;)I") {
-
-                                println("MixinMethodTransformer---transform---modifyMethodInsnNode")
-                                modifyMethodInsnNode(it, node)
-                            }
+                            // 简易版本
+//                            if (it.owner == "android/util/Log" && it.name == "e" && it.desc == "(Ljava/lang/String;Ljava/lang/String;)I") {
+//                                println("MixinMethodTransformer---transform---modifyMethodInsnNode")
+//                                modifyMethodInsnNode(it, node)
+//                            }
+                            it.handleInsnNode(node)
                         }
                     }
                 }
@@ -63,4 +69,29 @@ class MixinClassNode(private val classVisitor: ClassVisitor?) : ClassNode(Opcode
             node.instructions.remove(it)  // 看起来内部自己处理了链表的删除逻辑
         }
     }
+}
+
+private fun MethodInsnNode.handleInsnNode(node: MethodNode) {
+    Mixin.mixinDataList.forEach { mixinData ->
+        val proxyData = mixinData.proxyData
+        if (this.owner == proxyData?.owner
+            && this.name == proxyData?.name
+            && this.desc == "(Ljava/lang/String;Ljava/lang/String;)I"  // TODO proxtData新增descriptor属性
+        ) {
+            node.modify(this, mixinData)
+        }
+    }
+}
+
+private fun MethodNode.modify(insnNode: MethodInsnNode, mixinData: MixinData) {
+    val newMethodInsnNode =
+        MethodInsnNode(
+            insnNode.opcode,
+            mixinData.owner,
+            mixinData.methodName,
+            mixinData.descriptor,
+            false
+        )
+    instructions.insert(insnNode, newMethodInsnNode)
+    instructions.remove(insnNode)
 }
