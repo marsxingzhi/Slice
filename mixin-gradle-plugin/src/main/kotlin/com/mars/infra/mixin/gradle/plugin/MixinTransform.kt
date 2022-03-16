@@ -73,10 +73,10 @@ class MixinTransform : Transform() {
         ZipOutputStream(output.outputStream()).use { zos ->
             zos.setMethod(ZipOutputStream.STORED)  // 设置压缩方法，这里仅打包归档存储
             ZipFile(jarInput.file).use { originJar ->
-                println("MixinTransform---processJar---originJar name = ${originJar.name}")
+//                println("MixinTransform---processJar---originJar name = ${originJar.name}")
                 originJar.entries().iterator().forEach { zipEntry ->
                     if (!zipEntry.isDirectory && zipEntry.name.endsWith(".class")) {
-                        println("MixinTransform---processJar---zipEntry: ${zipEntry.name}")
+//                        println("MixinTransform---processJar---zipEntry: ${zipEntry.name}")
                         val inputStream = originJar.getInputStream(zipEntry).readBytes()
                         doTransform(inputStream)?.let {
                             zos.writeEntry(zipEntry.name, it)
@@ -106,9 +106,9 @@ class MixinTransform : Transform() {
                 processDir(it, destFile)
             } else if (it.isFile) {
                 if (it.absolutePath.endsWith(".class")) {
-                    println("MixinTransform---processDir---inputPath: ${it.absolutePath}")
-                    println("MixinTransform---processDir---outputPath: ${destFile.absolutePath}")
-                    println("=== ===")
+//                    println("MixinTransform---processDir---inputPath: ${it.absolutePath}")
+//                    println("MixinTransform---processDir---outputPath: ${destFile.absolutePath}")
+//                    println("=== ===")
                     weave(FileInputStream(it.absolutePath), destFile)
                 } else {
                     FileUtils.copyFile(it, destFile)

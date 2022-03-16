@@ -22,6 +22,25 @@ class MixinClassNode(private val classVisitor: ClassVisitor?) : ClassNode(Opcode
             transformer.transform(methodNode)
         }
 
+        // TODO test
+        if (name == "com/mars/infra/mixin/LoginService") {
+            val methodNode = MethodNode(Opcodes.ACC_PUBLIC or Opcodes.ACC_STATIC, "test_123", "()V", null, null)
+            methods.add(methodNode)
+
+            val il = methodNode.instructions
+            il.add(InsnNode(Opcodes.RETURN))
+
+            methodNode.maxStack = 0
+            methodNode.maxLocals = 0
+        }
+        // TODO 现在要做的就是将Logger中的superE方法添加到LoginService类中
+        // 存在问题：关键现在遍历到LoginService了，但是怎么知道Logger的指令呢？
+        // 是不是可以在第一遍的时候，就将指令保存起来？MethodNode指令保存一下
+
+
+
+
+
         super.visitEnd()
         classVisitor?.let { accept(it) }
     }
@@ -36,7 +55,7 @@ class MixinClassNode(private val classVisitor: ClassVisitor?) : ClassNode(Opcode
 //            println("MixinMethodTransformer---transform---node name = ${node?.name}")
             node ?: return
 
-            // 精准定位到LoginService#login方法
+            // TODO 暂时 精准定位到LoginService#login方法
             if (owner == "com/mars/infra/mixin/LoginService" && node.name == "login" && node.desc == "()V") {
                 println("MixinMethodTransformer---transform---call LoginService#login")
 
@@ -48,6 +67,7 @@ class MixinClassNode(private val classVisitor: ClassVisitor?) : ClassNode(Opcode
 //                                println("MixinMethodTransformer---transform---modifyMethodInsnNode")
 //                                modifyMethodInsnNode(it, node)
 //                            }
+                            // 这里只是修改指令，使用Logger.superE替换Log.e，但是Logger这个类不应该存在!
                             it.handleInsnNode(node)
                         }
                     }
