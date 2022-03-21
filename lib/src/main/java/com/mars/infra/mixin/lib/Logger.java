@@ -23,7 +23,7 @@ public class Logger {
      */
     @Proxy(owner = "android/util/Log", name = "e")
     public static int superE(String tag, String msg) {
-        Log.e(tag, msg + " ---> hook success");
-        return -1;
+        System.out.println("打印日志--->");
+        return Log.e(tag, msg + " ---> hook success");
     }
 }

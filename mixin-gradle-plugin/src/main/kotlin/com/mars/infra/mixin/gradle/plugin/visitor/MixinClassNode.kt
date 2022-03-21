@@ -2,7 +2,9 @@ package com.mars.infra.mixin.gradle.plugin.visitor
 
 import com.mars.infra.mixin.gradle.plugin.Mixin
 import com.mars.infra.mixin.gradle.plugin.MixinData
+import com.mars.infra.mixin.gradle.plugin.buildMixinMethodName
 import com.mars.infra.mixin.gradle.plugin.core.MethodTransformer
+import com.mars.infra.mixin.gradle.plugin.no
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.tree.*
@@ -10,11 +12,13 @@ import org.objectweb.asm.tree.*
 /**
  * Created by Mars on 2022/3/14
  */
-class MixinClassNode(private val classVisitor: ClassVisitor?) : ClassNode(Opcodes.ASM7) {
+class MixinClassNode(private val classVisitor: ClassVisitor?) : ClassNode(Opcodes.ASM7), IHook {
+
+    private var hasHook = false
 
     override fun visitEnd() {
 
-        val transformer = MixinMethodTransformer(name, null)
+        val transformer = MixinMethodTransformer(this, name, null)
 
         methods.filter {
             (it.access and Opcodes.ACC_NATIVE) == 0 && (it.access and Opcodes.ACC_ABSTRACT) == 0
@@ -37,15 +41,30 @@ class MixinClassNode(private val classVisitor: ClassVisitor?) : ClassNode(Opcode
         // 存在问题：关键现在遍历到LoginService了，但是怎么知道Logger的指令呢？
         // 是不是可以在第一遍的时候，就将指令保存起来？MethodNode指令保存一下
 
-
-
-
-
         super.visitEnd()
         classVisitor?.let { accept(it) }
     }
 
+    /**
+     * 这里新增方法
+     */
+    override fun hook(mixinData: MixinData) {
+        hasHook.no {
+//            cv.visitMethod()
+            val hookMethodNode = MethodNode(Opcodes.ACC_PUBLIC or Opcodes.ACC_STATIC,
+                mixinData.methodName.buildMixinMethodName(),
+                mixinData.descriptor, null, null)
+
+            methods.add(hookMethodNode)
+
+            mixinData.methodNode?.accept(hookMethodNode)
+
+            hasHook = true
+        }
+    }
+
     private class MixinMethodTransformer(
+        private val iHook: IHook,
         private val owner: String,
         methodTransformer: MethodTransformer?
     ) : MethodTransformer(methodTransformer) {
@@ -68,10 +87,13 @@ class MixinClassNode(private val classVisitor: ClassVisitor?) : ClassNode(Opcode
 //                                modifyMethodInsnNode(it, node)
 //                            }
                             // 这里只是修改指令，使用Logger.superE替换Log.e，但是Logger这个类不应该存在!
-                            it.handleInsnNode(node)
+                            it.handleInsnNode(node, owner, iHook)
                         }
                     }
                 }
+
+                // TODO test
+
             }
         }
 
@@ -91,27 +113,42 @@ class MixinClassNode(private val classVisitor: ClassVisitor?) : ClassNode(Opcode
     }
 }
 
-private fun MethodInsnNode.handleInsnNode(node: MethodNode) {
+private fun MethodInsnNode.handleInsnNode(node: MethodNode, owner: String, iHook: IHook) {
     Mixin.mixinDataList.forEach { mixinData ->
         val proxyData = mixinData.proxyData
         if (this.owner == proxyData?.owner
             && this.name == proxyData?.name
             && this.desc == "(Ljava/lang/String;Ljava/lang/String;)I"  // TODO proxtData新增descriptor属性
         ) {
-            node.modify(this, mixinData)
+            iHook.hook(mixinData)
+            node.modify(this, mixinData, owner)
         }
     }
 }
 
-private fun MethodNode.modify(insnNode: MethodInsnNode, mixinData: MixinData) {
-    val newMethodInsnNode =
-        MethodInsnNode(
-            insnNode.opcode,
-            mixinData.owner,
-            mixinData.methodName,
-            mixinData.descriptor,
-            false
-        )
+private fun MethodNode.modify(insnNode: MethodInsnNode, mixinData: MixinData, owner: String) {
+    // 调用Logger.superE方法
+//    val newMethodInsnNode =
+//        MethodInsnNode(
+//            insnNode.opcode,
+//            mixinData.owner,
+//            mixinData.methodName,
+//            mixinData.descriptor,
+//            false
+//        )
+    // 调用当前类中生成的_generate_superE_mixin方法
+        val newMethodInsnNode =
+            MethodInsnNode(
+                insnNode.opcode,
+                owner,
+                mixinData.methodName.buildMixinMethodName(),
+                mixinData.descriptor,
+                false
+            )
     instructions.insert(insnNode, newMethodInsnNode)
     instructions.remove(insnNode)
+}
+
+interface IHook {
+    fun hook(mixinData: MixinData)
 }
