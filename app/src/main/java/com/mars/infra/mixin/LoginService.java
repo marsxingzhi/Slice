@@ -17,5 +17,15 @@ public class LoginService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        Log.i("LoginService", "login end");
+    }
+
+    public static void logout() {
+        Log.i("LoginService", "start logout");
+        try {
+            Thread.sleep(10);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 }

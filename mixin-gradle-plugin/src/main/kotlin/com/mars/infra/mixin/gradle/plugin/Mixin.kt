@@ -50,9 +50,13 @@ object Mixin {
 //                    collectInternal(originJar.getInputStream(zipEntry))
 //                }
 
-                if (!zipEntry.isDirectory
-                    && zipEntry.name.endsWith(".class")
-                    && zipEntry.name.contains(TEMP_HOOK_CLASS)) {
+//                if (!zipEntry.isDirectory
+//                    && zipEntry.name.endsWith(".class")
+//                    && zipEntry.name.contains(TEMP_HOOK_CLASS)) {
+//                    collectInternalV2(originJar.getInputStream(zipEntry))
+//                }
+
+                if (!zipEntry.isDirectory && zipEntry.name.endsWith(".class")) {
                     collectInternalV2(originJar.getInputStream(zipEntry))
                 }
             }
@@ -71,8 +75,12 @@ object Mixin {
 //                    collectInternal(it.inputStream())
 //                }
 
-                if (it.absolutePath.equals(".class")
-                    && it.absolutePath.contains(TEMP_HOOK_CLASS)) {
+//                if (it.absolutePath.equals(".class")
+//                    && it.absolutePath.contains(TEMP_HOOK_CLASS)) {
+//                    collectInternalV2(it.inputStream())
+//                }
+
+                if (it.absolutePath.equals(".class")) {
                     collectInternalV2(it.inputStream())
                 }
             }
@@ -85,7 +93,16 @@ object Mixin {
             val classNode = ClassNode()
             classReader.accept(classNode, ClassReader.EXPAND_FRAMES)
 
-            classNode.handleNode()
+            // Mixin注解是AnnotationRetention.BINARY，因此使用invisibleAnnotations
+            var mixinClass = false
+           classNode.invisibleAnnotations?.forEach { node ->
+                if (node.desc == ANNOTATION_MIXIN) {
+                    mixinClass = true
+                }
+            }
+            mixinClass.yes {
+                classNode.handleNode()
+            }
         }
     }
 

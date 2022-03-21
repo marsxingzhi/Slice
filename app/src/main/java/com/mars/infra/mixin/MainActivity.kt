@@ -7,19 +7,21 @@ import android.widget.Button
 class MainActivity : AppCompatActivity() {
 
     lateinit var mBtnStartLogin: Button
+    lateinit var mBtnLogout: Button
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         mBtnStartLogin = findViewById(R.id.btn_start_login)
+        mBtnLogout = findViewById(R.id.btn_logout)
 
         mBtnStartLogin.setOnClickListener {
-            login()
+            LoginService.login()
         }
-    }
 
-    private fun login() {
-        LoginService.login()
+        mBtnLogout.setOnClickListener {
+            LoginService.logout()
+        }
     }
 }
