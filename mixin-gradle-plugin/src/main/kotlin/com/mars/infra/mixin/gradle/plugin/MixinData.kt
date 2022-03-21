@@ -1,5 +1,7 @@
 package com.mars.infra.mixin.gradle.plugin
 
+import org.objectweb.asm.tree.MethodNode
+
 /**
  * Created by Mars on 2022/3/15
  *
@@ -12,7 +14,8 @@ data class MixinData(
     val owner: String?,
     val methodName: String?,
     val descriptor: String?,
-    var proxyData: ProxyData? = null
+    var proxyData: ProxyData? = null,
+    val methodNode: MethodNode? = null
 )
 
 /**

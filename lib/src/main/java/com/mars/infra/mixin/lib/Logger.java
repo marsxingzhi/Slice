@@ -2,11 +2,13 @@ package com.mars.infra.mixin.lib;
 
 import android.util.Log;
 
+import com.mars.infra.mixin.annotations.Mixin;
 import com.mars.infra.mixin.annotations.Proxy;
 
 /**
  * Created by Mars on 2022/3/14
  */
+@Mixin
 public class Logger {
 
 //    public static void superE(String tag, String msg) {
@@ -21,7 +23,7 @@ public class Logger {
      */
     @Proxy(owner = "android/util/Log", name = "e")
     public static int superE(String tag, String msg) {
-        Log.e(tag, msg + " ---> invoke by Logger");
+        Log.e(tag, msg + " ---> hook success");
         return -1;
     }
 }

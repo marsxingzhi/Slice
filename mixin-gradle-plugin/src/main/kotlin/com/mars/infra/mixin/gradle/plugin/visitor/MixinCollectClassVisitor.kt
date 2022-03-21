@@ -12,6 +12,7 @@ import org.objectweb.asm.Opcodes
 /**
  * Created by Mars on 2022/3/15
  */
+@Deprecated(message = "需要使用tree api拿到Insn")
 class MixinCollectClassVisitor : ClassVisitor(Opcodes.ASM7) {
 
     private var owner: String? = null
@@ -26,17 +27,6 @@ class MixinCollectClassVisitor : ClassVisitor(Opcodes.ASM7) {
     ) {
         owner = name
         super.visit(version, access, name, signature, superName, interfaces)
-    }
-
-    override fun visitAnnotation(descriptor: String?, visible: Boolean): AnnotationVisitor? {
-//        println("MixinCollectClassVisitor----owner = $owner, visitAnnotation = $descriptor, visible = $visible")
-//        return try {
-//            super.visitAnnotation(descriptor, visible)
-//        } catch (e: Exception) {
-//            e.printStackTrace()
-//            null
-//        }
-        return super.visitAnnotation(descriptor, visible)
     }
 
     override fun visitMethod(
