@@ -46,22 +46,9 @@ object Mixin {
         }
     }
 
-    // 一定需要过滤，只处理.class
     private fun forEachJar(jarInput: JarInput) {
         ZipFile(jarInput.file).use { originJar ->
             originJar.entries().iterator().forEach { zipEntry ->
-                // 不需要遍历所有的类
-                // 这里的注释不要删
-//                if (!zipEntry.isDirectory && zipEntry.name.endsWith(".class")) {
-//                    collectInternal(originJar.getInputStream(zipEntry))
-//                }
-
-//                if (!zipEntry.isDirectory
-//                    && zipEntry.name.endsWith(".class")
-//                    && zipEntry.name.contains(TEMP_HOOK_CLASS)) {
-//                    collectInternalV2(originJar.getInputStream(zipEntry))
-//                }
-
                 if (!zipEntry.isDirectory && zipEntry.name.endsWith(".class")) {
                     collectInternalV2(originJar.getInputStream(zipEntry))
                 }
@@ -69,23 +56,11 @@ object Mixin {
         }
     }
 
-    // 一定需要过滤，只处理.class
     private fun forEachDir(input: File) {
         input.listFiles()?.forEach {
             if (it.isDirectory) {
                 forEachDir(it)
             } else if (it.isFile) {
-                // 不需要遍历所有的类
-                // 这里的注释不要删
-//                if (it.absolutePath.endsWith(".class")) {
-//                    collectInternal(it.inputStream())
-//                }
-
-//                if (it.absolutePath.equals(".class")
-//                    && it.absolutePath.contains(TEMP_HOOK_CLASS)) {
-//                    collectInternalV2(it.inputStream())
-//                }
-//                println("收集---file = ${it.path}")
                 if (it.absolutePath.endsWith(".class")) {
                     collectInternalV2(it.inputStream())
                 }
@@ -135,11 +110,9 @@ private fun ClassNode.handleNode() {
                 && it.access and Opcodes.ACC_NATIVE == 0
                 && it.name != "<init>"
     }.forEach { methodNode ->
-//        println("handleNode---methodNode = ${methodNode.name}")
         val mixinData = MixinData(name, methodNode.name, methodNode.desc, methodNode = methodNode)
 
-        methodNode.invisibleAnnotations.forEach { annotationNode ->
-//            println("handleNode---annotationNode = ${annotationNode.desc}")
+        methodNode.invisibleAnnotations?.forEach { annotationNode ->
             if (annotationNode.desc == ANNOTATION_PROXY) {
                 var index = 0
                 val owner = annotationNode.values[++index] as String
@@ -155,14 +128,6 @@ private fun ClassNode.handleNode() {
                 }, error = {
                     throw Exception("${owner}.${name} 方法已经被hook了，不能重复hook")
                 })
-
-//                val key = checkHookMethodExist(owner, name)
-//                if (Mixin.mixinDataMap.containsKey(key)) {
-//                    // 抛异常
-//                    throw Exception("不能重复hook相同方法")
-//                } else {
-//                    Mixin.mixinDataMap[key] = mixinData
-//                }
             }
         }
     }

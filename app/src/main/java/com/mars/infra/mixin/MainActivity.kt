@@ -2,6 +2,7 @@ package com.mars.infra.mixin
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 
 class MainActivity : AppCompatActivity() {
@@ -23,5 +24,7 @@ class MainActivity : AppCompatActivity() {
         mBtnLogout.setOnClickListener {
             LoginService.logout()
         }
+
+        Log.e("MainActivity", "onCreate")
     }
 }

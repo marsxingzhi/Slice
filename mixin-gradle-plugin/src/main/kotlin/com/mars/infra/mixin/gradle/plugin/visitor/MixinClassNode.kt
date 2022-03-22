@@ -23,7 +23,10 @@ class MixinClassNode(private val classVisitor: ClassVisitor?) : ClassNode(Opcode
         val transformer = MixinMethodTransformer(this, name, null)
 
         methods.filter {
-            (it.access and Opcodes.ACC_NATIVE) == 0 && (it.access and Opcodes.ACC_ABSTRACT) == 0
+            it.access and Opcodes.ACC_ABSTRACT == 0
+                    && it.access and Opcodes.ACC_NATIVE == 0
+                    && it.name != "<init>"
+                    && it.name != "<clinit>"
         }.forEach { methodNode ->
             transformer.transform(methodNode)
         }
@@ -52,9 +55,8 @@ class MixinClassNode(private val classVisitor: ClassVisitor?) : ClassNode(Opcode
      */
     override fun hook(mixinData: MixinData) {
         hasHook.no {
-//            cv.visitMethod()
-
             // 需要判断一下相同方法如果已经添加过了，就不能重复添加。这里判断不准确，应该方法名不一定一致啊
+            // 这里好像没有必要再次判断，重复的判断收敛到数据源
             val flag = "${mixinData.methodName.buildMixinMethodName()}-${mixinData.descriptor}"
             if (hookMethodSet.contains(flag)) {
                 return
@@ -66,9 +68,6 @@ class MixinClassNode(private val classVisitor: ClassVisitor?) : ClassNode(Opcode
             methods.add(hookMethodNode)
 
             mixinData.methodNode?.accept(hookMethodNode)
-
-            // 这里不能过滤是否已经hook
-//            hasHook = true
         }
     }
 
@@ -80,29 +79,19 @@ class MixinClassNode(private val classVisitor: ClassVisitor?) : ClassNode(Opcode
 
         override fun transform(node: MethodNode?) {
             super.transform(node)
-//            println("MixinMethodTransformer---transform---node name = ${node?.name}")
             node ?: return
-
-            // TODO 暂时 精准定位到LoginService#login方法
-            if (owner == "com/mars/infra/mixin/LoginService" && node.name == "login" && node.desc == "()V") {
-                println("MixinMethodTransformer---transform---call LoginService#login")
-
-                node.instructions.iterator().forEach {
-                    when (it) {
-                        is MethodInsnNode -> {
-                            // 简易版本
+            node.instructions.iterator().forEach {
+                when (it) {
+                    is MethodInsnNode -> {
+                        // 简易版本
 //                            if (it.owner == "android/util/Log" && it.name == "e" && it.desc == "(Ljava/lang/String;Ljava/lang/String;)I") {
 //                                println("MixinMethodTransformer---transform---modifyMethodInsnNode")
 //                                modifyMethodInsnNode(it, node)
 //                            }
-                            // 这里只是修改指令，使用Logger.superE替换Log.e，但是Logger这个类不应该存在!
-                            it.handleInsnNode(node, owner, iHook)
-                        }
+                        // 这里只是修改指令，使用Logger.superE替换Log.e，但是Logger这个类不应该存在!
+                        it.handleInsnNode(node, owner, iHook)
                     }
                 }
-
-                // TODO test
-
             }
         }
 
