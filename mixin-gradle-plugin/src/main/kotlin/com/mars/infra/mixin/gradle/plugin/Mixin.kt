@@ -15,12 +15,18 @@ import java.util.zip.ZipFile
  */
 object Mixin {
 
+    @Deprecated("存在问题，无法判断是否hook相同的方法")
     val mixinDataList by lazy {
         arrayListOf<MixinData>()
     }
 
+    val mixinDataMap by lazy {
+        hashMapOf<String, MixinData>()
+    }
+
     fun clear() {
         mixinDataList.clear()
+        mixinDataMap.clear()
     }
 
 
@@ -143,6 +149,20 @@ private fun ClassNode.handleNode() {
 
                 println("handleNode---mixinData = $mixinData")
                 Mixin.mixinDataList.add(mixinData)
+
+                checkHookMethodExist(owner, name, success = {
+                    Mixin.mixinDataMap[it] = mixinData
+                }, error = {
+                    throw Exception("${owner}.${name} 方法已经被hook了，不能重复hook")
+                })
+
+//                val key = checkHookMethodExist(owner, name)
+//                if (Mixin.mixinDataMap.containsKey(key)) {
+//                    // 抛异常
+//                    throw Exception("不能重复hook相同方法")
+//                } else {
+//                    Mixin.mixinDataMap[key] = mixinData
+//                }
             }
         }
     }

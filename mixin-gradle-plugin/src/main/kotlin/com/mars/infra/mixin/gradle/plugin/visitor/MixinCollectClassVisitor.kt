@@ -1,9 +1,6 @@
 package com.mars.infra.mixin.gradle.plugin.visitor
 
-import com.mars.infra.mixin.gradle.plugin.ANNOTATION_PROXY
-import com.mars.infra.mixin.gradle.plugin.Mixin
-import com.mars.infra.mixin.gradle.plugin.MixinData
-import com.mars.infra.mixin.gradle.plugin.ProxyData
+import com.mars.infra.mixin.gradle.plugin.*
 import org.objectweb.asm.AnnotationVisitor
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.MethodVisitor
@@ -82,5 +79,10 @@ class MixinCollectAnnotation(annotationVisitor: AnnotationVisitor?,
         super.visitEnd()
         mixinData.proxyData = proxyData
         Mixin.mixinDataList.add(mixinData)
+        checkHookMethodExist(proxyData.owner!!, proxyData.name!!, {
+            Mixin.mixinDataMap[it] = mixinData
+        }, {
+            throw Exception("不能重复hook相同方法")
+        })
     }
 }

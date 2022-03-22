@@ -19,4 +19,12 @@ class TestMixin1 {
         System.out.println("TestMixin1--->hookLogI success, tag = " + tag + " msg = " + msg);
         return -1;
     }
+
+    /**
+     * 测试重复hook
+     */
+//    @Proxy(owner = "android/util/Log", name = "e")
+    public static int testHookSameMethod(String tag, String msg) {
+        return 0;
+    }
 }

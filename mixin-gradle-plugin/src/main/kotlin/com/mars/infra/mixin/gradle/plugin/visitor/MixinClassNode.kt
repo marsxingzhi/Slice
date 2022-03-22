@@ -123,7 +123,18 @@ class MixinClassNode(private val classVisitor: ClassVisitor?) : ClassNode(Opcode
 }
 
 private fun MethodInsnNode.handleInsnNode(node: MethodNode, owner: String, iHook: IHook) {
-    Mixin.mixinDataList.forEach { mixinData ->
+    // 废弃mixinDataList
+//    Mixin.mixinDataList.forEach { mixinData ->
+//        val proxyData = mixinData.proxyData
+//        if (this.owner == proxyData?.owner
+//            && this.name == proxyData?.name
+//            && this.desc == "(Ljava/lang/String;Ljava/lang/String;)I"  // TODO proxtData新增descriptor属性
+//        ) {
+//            iHook.hook(mixinData)
+//            node.modify(this, mixinData, owner)
+//        }
+//    }
+    Mixin.mixinDataMap.values.forEach { mixinData ->
         val proxyData = mixinData.proxyData
         if (this.owner == proxyData?.owner
             && this.name == proxyData?.name
