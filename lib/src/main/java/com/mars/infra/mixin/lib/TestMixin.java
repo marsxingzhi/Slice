@@ -21,7 +21,7 @@ class TestMixin {
     /**
      * hook Log.e，该方法有两个入参，这里也定义两个入参！
      */
-//    @Proxy(owner = "android/util/Log", name = "w")
+    @Proxy(owner = "android/util/Log", name = "w")
     public static int hookLogW(String tag, String msg) {
         Object value = ProxyInsnChain.proceed(tag, msg + " ---> TestMixin hook hookLogW success.");
         return (Integer) value;

@@ -27,5 +27,6 @@ public class LoginService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        Log.w("LoginService", "end logout");
     }
 }
