@@ -79,8 +79,8 @@ object Mixin {
 //                    && it.absolutePath.contains(TEMP_HOOK_CLASS)) {
 //                    collectInternalV2(it.inputStream())
 //                }
-
-                if (it.absolutePath.equals(".class")) {
+//                println("收集---file = ${it.path}")
+                if (it.absolutePath.endsWith(".class")) {
                     collectInternalV2(it.inputStream())
                 }
             }

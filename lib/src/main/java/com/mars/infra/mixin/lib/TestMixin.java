@@ -16,4 +16,5 @@ class TestMixin {
         System.out.println("打印日志--->TestMixin");
         return Log.e(tag, msg + " ---> hook success, TestMixin");
     }
+
 }

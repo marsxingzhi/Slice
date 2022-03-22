@@ -16,6 +16,8 @@ class MixinClassNode(private val classVisitor: ClassVisitor?) : ClassNode(Opcode
 
     private var hasHook = false
 
+    private var hookMethodSet = mutableSetOf<String>()
+
     override fun visitEnd() {
 
         val transformer = MixinMethodTransformer(this, name, null)
@@ -51,15 +53,22 @@ class MixinClassNode(private val classVisitor: ClassVisitor?) : ClassNode(Opcode
     override fun hook(mixinData: MixinData) {
         hasHook.no {
 //            cv.visitMethod()
-            val hookMethodNode = MethodNode(Opcodes.ACC_PUBLIC or Opcodes.ACC_STATIC,
+
+            // 需要判断一下相同方法如果已经添加过了，就不能重复添加。这里判断不准确，应该方法名不一定一致啊
+            val flag = "${mixinData.methodName.buildMixinMethodName()}-${mixinData.descriptor}"
+            if (hookMethodSet.contains(flag)) {
+                return
+            }
+            hookMethodSet.add(flag)
+            val hookMethodNode = MethodNode(Opcodes.ACC_PRIVATE or Opcodes.ACC_STATIC,
                 mixinData.methodName.buildMixinMethodName(),
                 mixinData.descriptor, null, null)
-
             methods.add(hookMethodNode)
 
             mixinData.methodNode?.accept(hookMethodNode)
 
-            hasHook = true
+            // 这里不能过滤是否已经hook
+//            hasHook = true
         }
     }
 
