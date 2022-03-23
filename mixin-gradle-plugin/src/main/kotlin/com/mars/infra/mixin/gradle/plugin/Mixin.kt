@@ -15,6 +15,8 @@ import java.util.zip.ZipFile
  */
 object Mixin {
 
+    const val OPCODE_PROCEED = -0x001
+
     @Deprecated("存在问题，无法判断是否hook相同的方法")
     val mixinDataList by lazy {
         arrayListOf<MixinData>()
@@ -22,6 +24,11 @@ object Mixin {
 
     val mixinDataMap by lazy {
         hashMapOf<String, MixinData>()
+    }
+
+    // @Mixin注解标识的类
+    val mixinHookClasses by lazy {
+        mutableSetOf<String>()
     }
 
     fun clear() {
@@ -79,6 +86,7 @@ object Mixin {
            classNode.invisibleAnnotations?.forEach { node ->
                 if (node.desc == ANNOTATION_MIXIN) {
                     mixinClass = true
+                    mixinHookClasses.add(classNode.name)
                 }
             }
             mixinClass.yes {
@@ -118,7 +126,7 @@ private fun ClassNode.handleNode() {
                 val owner = annotationNode.values[++index] as String
                 index++
                 val name = annotationNode.values[++index] as String
-                mixinData.proxyData = ProxyData(owner, name)
+                mixinData.proxyData = ProxyData(owner, name, methodNode.desc)
 
                 println("handleNode---mixinData = $mixinData")
                 Mixin.mixinDataList.add(mixinData)
@@ -130,5 +138,15 @@ private fun ClassNode.handleNode() {
                 })
             }
         }
+
+        // 遍历方法体，找到是否有调用ProxyInsnChain.proceed方法
+//        methodNode.instructions.iterator().forEach {
+//            if (it is MethodInsnNode
+//                && it.owner == PROXY_INSN_CHAIN_NAME
+//                && it.name == "proceed") {
+//                // 修改指令对应的opcode，然后在插入的时候，判断opcode，如果等于OPCODE_PROCEED，那么则插入原指令
+//                it.opcode = Mixin.OPCODE_PROCEED
+//            }
+//        }
     }
 }

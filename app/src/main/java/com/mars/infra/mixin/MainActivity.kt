@@ -26,5 +26,10 @@ class MainActivity : AppCompatActivity() {
         }
 
         Log.e("MainActivity", "onCreate")
+
+        // 测试hook code是否正确，即Log.e有多个重载方法，@Proxy标识的方法描述符与想要hook的方法描述符一致
+        Log.e("MainActivity", "Throwable", object : Throwable() {
+
+        })
     }
 }

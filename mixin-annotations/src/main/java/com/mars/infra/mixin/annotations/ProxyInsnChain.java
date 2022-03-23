@@ -11,7 +11,11 @@ package com.mars.infra.mixin.annotations;
 public class ProxyInsnChain {
 
     // test two params
-    public static Object proceed(String param1, String param2) {
-        return null;
+//    public static Object proceed(String param1, String param2) {
+//        return null;
+//    }
+
+    public static int proceed(String param1, String param2) {
+        return 0;
     }
 }

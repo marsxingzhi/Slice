@@ -25,5 +25,6 @@ data class MixinData(
  */
 data class ProxyData(
     var owner: String? = null,
-    var name: String? = null
+    var name: String? = null,
+    var descriptor: String? = null
 )
