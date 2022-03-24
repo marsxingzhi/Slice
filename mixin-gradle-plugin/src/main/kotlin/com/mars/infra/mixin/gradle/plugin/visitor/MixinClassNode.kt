@@ -64,11 +64,27 @@ class MixinClassNode(private val classVisitor: ClassVisitor?) : ClassNode(Opcode
                     descriptor: String?,
                     isInterface: Boolean
                 ) {
+                    // TODO 测试代码，如果调用Object ProxyInsnChain.proceed方法，则尝试过滤掉两个多余的指令
+                    if (opcode == Opcodes.INVOKEVIRTUAL
+                        && owner == "java/lang/Integer"
+                        && name == "intValue"
+                        && descriptor == "()I") {
+                        return
+                    }
+
+
                     if (owner == PROXY_INSN_CHAIN_NAME) {
                         // 原指令写入
                         insnNode.accept(mv)
                     } else {
                         super.visitMethodInsn(opcode, owner, name, descriptor, isInterface)
+                    }
+                }
+
+                override fun visitTypeInsn(opcode: Int, type: String?) {
+                    // TODO 测试代码，如果调用Object ProxyInsnChain.proceed方法，则尝试过滤掉两个多余的指令
+                    if (opcode != Opcodes.CHECKCAST) {
+                        super.visitTypeInsn(opcode, type)
                     }
                 }
             })

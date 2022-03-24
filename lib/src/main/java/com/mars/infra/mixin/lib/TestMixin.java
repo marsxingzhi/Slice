@@ -26,8 +26,8 @@ class TestMixin {
      */
     @Proxy(owner = "android/util/Log", name = "w")
     public static int hookLogW(String tag, String msg) {
-        int value =  ProxyInsnChain.proceed(tag, msg + " ---> TestMixin hook hookLogW success.");
-        return value;
+//        int value = (int) ProxyInsnChain.proceed(tag, msg + " ---> TestMixin hook hookLogW success.");
+        return (int) ProxyInsnChain.proceed(tag, msg + " ---> TestMixin hook hookLogW success.");
     }
 
 }
