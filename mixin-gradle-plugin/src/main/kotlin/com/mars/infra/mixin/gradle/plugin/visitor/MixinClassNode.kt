@@ -57,6 +57,66 @@ class MixinClassNode(private val classVisitor: ClassVisitor?) : ClassNode(Opcode
              * 但是在写入过程中如果遇到ProxyInsnChain.proceed对应的指令需要将LogW对应的方法指令写入（原指令）
              */
             mixinData.methodNode?.accept(object: MethodVisitor(Opcodes.ASM7, hookMethodNode) {
+
+                // 美式方案，虽然粗糙了些，但是可以用
+                private fun filter(opcode: Int, owner: String?, name: String?, descriptor: String?): Boolean {
+                    if (opcode == Opcodes.INVOKEVIRTUAL
+                        && owner == "java/lang/Integer"
+                        && name == "intValue"
+                        && descriptor == "()I") {
+                        return true
+                    }
+                    if (opcode == Opcodes.INVOKEVIRTUAL
+                        && owner == "java/lang/Long"
+                        && name == "longValue"
+                        && descriptor == "()J") {
+                        return true
+                    }
+                    if (opcode == Opcodes.INVOKEVIRTUAL
+                        && owner == "java/lang/Float"
+                        && name == "floatValue"
+                        && descriptor == "()F") {
+                        return true
+                    }
+                    if (opcode == Opcodes.INVOKEVIRTUAL
+                        && owner == "java/lang/Double"
+                        && name == "doubleValue"
+                        && descriptor == "()D") {
+                        return true
+                    }
+
+                    if (opcode == Opcodes.INVOKEVIRTUAL
+                        && owner == "java/lang/Boolean"
+                        && name == "booleanValue"
+                        && descriptor == "()Z") {
+                        return true
+                    }
+                    if (opcode == Opcodes.INVOKEVIRTUAL
+                        && owner == "java/lang/Character"
+                        && name == "charValue"
+                        && descriptor == "()C") {
+                            Char
+                        return true
+                    }
+                    if (opcode == Opcodes.INVOKEVIRTUAL
+                        && owner == "java/lang/Byte"
+                        && name == "byteValue"
+                        && descriptor == "()B") {
+                        Char
+                        return true
+                    }
+                    if (opcode == Opcodes.INVOKEVIRTUAL
+                        && owner == "java/lang/Short"
+                        && name == "shortValue"
+                        && descriptor == "()S") {
+                        Char
+                        return true
+                    }
+                    // 缺少数组
+                    return false
+                }
+
+
                 override fun visitMethodInsn(
                     opcode: Int,
                     owner: String?,
@@ -65,13 +125,9 @@ class MixinClassNode(private val classVisitor: ClassVisitor?) : ClassNode(Opcode
                     isInterface: Boolean
                 ) {
                     // TODO 测试代码，如果调用Object ProxyInsnChain.proceed方法，则尝试过滤掉两个多余的指令
-                    if (opcode == Opcodes.INVOKEVIRTUAL
-                        && owner == "java/lang/Integer"
-                        && name == "intValue"
-                        && descriptor == "()I") {
+                    if (filter(opcode, owner, name, descriptor)) {
                         return
                     }
-
 
                     if (owner == PROXY_INSN_CHAIN_NAME) {
                         // 原指令写入
@@ -83,6 +139,7 @@ class MixinClassNode(private val classVisitor: ClassVisitor?) : ClassNode(Opcode
 
                 override fun visitTypeInsn(opcode: Int, type: String?) {
                     // TODO 测试代码，如果调用Object ProxyInsnChain.proceed方法，则尝试过滤掉两个多余的指令
+                    // TODO 不能直接判断，如果项目中确实存在强转，这里不就出现问题了吗? 待修改。 再次测试了一下，好像没报错...
                     if (opcode != Opcodes.CHECKCAST) {
                         super.visitTypeInsn(opcode, type)
                     }

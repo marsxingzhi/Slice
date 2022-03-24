@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import com.mars.infra.mixin.lib.Logger
 
 class MainActivity : AppCompatActivity() {
 
@@ -31,5 +32,25 @@ class MainActivity : AppCompatActivity() {
         Log.e("MainActivity", "Throwable", object : Throwable() {
 
         })
+    }
+
+    override fun onStart() {
+        super.onStart()
+
+        // 待hook
+        val logger = Logger()
+        logger.printNotStatic()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // 待hook
+        Logger.printL(TAG, "onResume")
+
+        Logger.printLForce(TAG, "onResume---printLForce")
+    }
+
+    companion object {
+        private const val TAG = "MainActivity"
     }
 }

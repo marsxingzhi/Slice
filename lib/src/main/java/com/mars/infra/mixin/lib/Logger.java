@@ -1,25 +1,27 @@
-//package com.mars.infra.mixin.lib;
-//
-//import android.util.Log;
-//
-//import com.mars.infra.mixin.annotations.Mixin;
-//import com.mars.infra.mixin.annotations.Proxy;
-//
-///**
-// * Created by Mars on 2022/3/14
-// */
-//@Mixin
-//public class Logger {
-//
-//    /**
-//     * 使用Logger.superE方法替换Log.e方法，一定需要返回值
-//     * TODO
-//     * 1. 感觉最好还是加一个scope，可能只想hook业务方代码，对于系统或者其他三方库的不想要hook
-//     * 2. 新增一个descriptor
-//     */
-//    @Proxy(owner = "android/util/Log", name = "e")
-//    public static int superE(String tag, String msg) {
-//        System.out.println("打印日志--->");
-//        return Log.e(tag, msg + " ---> hook success");
-//    }
-//}
+package com.mars.infra.mixin.lib;
+
+import android.util.Log;
+
+/**
+ * Created by Mars on 2022/3/14
+ * <p>
+ * sdk
+ */
+public class Logger {
+
+    public static long printL(String tag, String msg) {
+        System.out.println(tag + " ---> " + msg);
+        return 1L;
+    }
+
+    public static long printLForce(String tag, String msg) {
+        // Log.d方法没有被hook
+        int value = Log.d(tag, msg);
+        return (long) value;
+    }
+
+    public void printNotStatic() {
+        System.out.println("this is printNotStatic of Logger");
+    }
+
+}
