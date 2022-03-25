@@ -2,6 +2,8 @@ package com.mars.infra.mixin;
 
 import android.util.Log;
 
+import com.mars.infra.mixin.lib.Login;
+
 /**
  * Created by Mars on 2022/3/14
  */
@@ -17,6 +19,12 @@ public class LoginService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        // 真正执行登录逻辑
+        Login login = new Login();
+        login.login("zhangsan", "123456");
+
+
         Log.i("LoginService", "login end");
     }
 

@@ -42,6 +42,10 @@ public class ProxyInsnChain {
         return null;
     }
 
+    public static Object proceed(Object obj, String param1, String param2) {
+        return null;
+    }
+
     // 对比代码，不要删
 //    public static int proceed(String param1, String param2) {
 //        return 0;
