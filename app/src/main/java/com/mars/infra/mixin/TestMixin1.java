@@ -9,7 +9,7 @@ import com.mars.infra.mixin.annotations.Proxy;
 @Mixin
 class TestMixin1 {
 
-    @Proxy(owner = "android/util/Log", name = "i")
+    @Proxy(owner = "android/util/Log", name = "i", isStatic = true)
     public static int hookLogI(String tag, String msg) {
         try {
             Thread.sleep(100);

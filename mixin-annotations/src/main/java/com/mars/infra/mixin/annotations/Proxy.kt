@@ -9,5 +9,6 @@ package com.mars.infra.mixin.annotations
 @Retention(AnnotationRetention.BINARY)
 annotation class Proxy(
     val owner: String,
-    val name: String
+    val name: String,
+    val isStatic: Boolean  // 目标方法是否是静态方法
 )

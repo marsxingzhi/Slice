@@ -5,6 +5,7 @@ import com.android.build.api.transform.TransformInvocation
 import com.mars.infra.mixin.gradle.plugin.visitor.MixinCollectClassVisitor
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.Opcodes
+import org.objectweb.asm.Type
 import org.objectweb.asm.tree.ClassNode
 import java.io.File
 import java.io.InputStream
@@ -122,13 +123,28 @@ private fun ClassNode.handleNode() {
 
         methodNode.invisibleAnnotations?.forEach { annotationNode ->
             if (annotationNode.desc == ANNOTATION_PROXY) {
+                // TODO 粗糙实现，默认是严格按照顺序的
                 var index = 0
                 val owner = annotationNode.values[++index] as String
                 index++
                 val name = annotationNode.values[++index] as String
-                mixinData.proxyData = ProxyData(owner, name, methodNode.desc)
+                index++
+                val isStatic = annotationNode.values[++index] as Boolean
+                val argumentTypes = Type.getArgumentTypes(methodNode.desc)
+                val returnType = Type.getReturnType(methodNode.desc)
 
-                println("handleNode---mixinData = $mixinData")
+                var realDescriptor = "("
+                for (i in argumentTypes.indices) {
+                    if (i == 0 && !isStatic) {
+                        continue
+                    }
+                    realDescriptor += argumentTypes[i]
+                }
+                realDescriptor += ")"
+                realDescriptor += returnType.descriptor
+
+                mixinData.proxyData = ProxyData(owner, name, realDescriptor)
+
                 Mixin.mixinDataList.add(mixinData)
 
                 checkHookMethodExist(owner, name, success = {
