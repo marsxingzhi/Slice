@@ -14,8 +14,8 @@ class LogMixin {
 
     @Proxy(owner = "android/util/Log", name = "e", isStatic = true)
     public static int hookLogE(String tag, String msg) {
-        System.out.println("打印日志--->TestMixin");
-        return Log.e(tag, msg + " ---> hook success, TestMixin");
+        System.out.println("LogMixin hookLogE hook success");
+        return Log.e(tag, msg + " ---> LogMixin hookLogE hook success");
     }
 
     /**
@@ -26,8 +26,7 @@ class LogMixin {
      */
     @Proxy(owner = "android/util/Log", name = "w", isStatic = true)
     public static int hookLogW(String tag, String msg) {
-//        int value = (int) ProxyInsnChain.proceed(tag, msg + " ---> TestMixin hook hookLogW success.");
-        return (int) ProxyInsnChain.proceed(tag, msg + " ---> TestMixin hook hookLogW success.");
+        return (int) ProxyInsnChain.proceed(tag, msg + " ---> LogMixin hookLogW hook success.");
     }
 
 }

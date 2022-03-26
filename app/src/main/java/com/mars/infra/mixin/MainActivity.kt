@@ -19,7 +19,7 @@ class MainActivity : AppCompatActivity() {
         mBtnLogout = findViewById(R.id.btn_logout)
 
         mBtnStartLogin.setOnClickListener {
-            LoginService.login()
+            LoginService.startLogin()
         }
 
         mBtnLogout.setOnClickListener {

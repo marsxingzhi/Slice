@@ -12,7 +12,7 @@ public class LoginService {
     /**
      * aop替换Log.e方法，替换成Logger.superE
      */
-    public static void login() {
+    public static void startLogin() {
         Log.e("LoginService", "invoke login");
         try {
             Thread.sleep(100);

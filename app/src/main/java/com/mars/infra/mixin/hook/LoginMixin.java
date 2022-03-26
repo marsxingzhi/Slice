@@ -14,7 +14,7 @@ import com.mars.infra.mixin.utils.LoginUtils;
  * 背景：Login#login登录方法中并未对用户名和密码做有效性判断
  * hook Login对象的login实例方法，需要在hook方法参数中添加this对象
  */
-//@Mixin
+@Mixin
 class LoginMixin {
 
     /**

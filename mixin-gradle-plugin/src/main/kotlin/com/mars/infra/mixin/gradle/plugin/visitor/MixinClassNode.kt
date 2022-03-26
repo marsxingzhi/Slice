@@ -58,6 +58,8 @@ class MixinClassNode(private val classVisitor: ClassVisitor?) : ClassNode(Opcode
              */
             mixinData.methodNode?.accept(object: MethodVisitor(Opcodes.ASM7, hookMethodNode) {
 
+                private var hasInvokeProxyInsnChain = false
+
                 // 美式方案，虽然粗糙了些，但是可以用
                 private fun filter(opcode: Int, owner: String?, name: String?, descriptor: String?): Boolean {
                     if (opcode == Opcodes.INVOKEVIRTUAL
@@ -131,6 +133,7 @@ class MixinClassNode(private val classVisitor: ClassVisitor?) : ClassNode(Opcode
 
                     if (owner == PROXY_INSN_CHAIN_NAME) {
                         // 原指令写入
+                        hasInvokeProxyInsnChain = true
                         insnNode.accept(mv)
                     } else {
                         super.visitMethodInsn(opcode, owner, name, descriptor, isInterface)
@@ -140,7 +143,11 @@ class MixinClassNode(private val classVisitor: ClassVisitor?) : ClassNode(Opcode
                 override fun visitTypeInsn(opcode: Int, type: String?) {
                     // TODO 测试代码，如果调用Object ProxyInsnChain.proceed方法，则尝试过滤掉两个多余的指令
                     // TODO 不能直接判断，如果项目中确实存在强转，这里不就出现问题了吗? 待修改。 再次测试了一下，好像没报错...
-                    if (opcode != Opcodes.CHECKCAST) {
+
+                    // TODO-gy 果然出现了问题，没道理不让我过啊
+                    // 暂时使用变量进行判断
+                    if (opcode != Opcodes.CHECKCAST || !hasInvokeProxyInsnChain) {
+                        hasInvokeProxyInsnChain = false  // 恢复
                         super.visitTypeInsn(opcode, type)
                     }
                 }
@@ -187,7 +194,6 @@ private fun MethodInsnNode.handleInsnNode(node: MethodNode, owner: String, iHook
         val proxyData = mixinData.proxyData
         if (this.owner == proxyData?.owner
             && this.name == proxyData?.name
-//            && this.desc == "(Ljava/lang/String;Ljava/lang/String;)I"  // TODO proxtData新增descriptor属性
             && this.desc == proxyData?.descriptor) {
             iHook.hook(this, mixinData)
             node.modify(this, mixinData, owner)
@@ -195,10 +201,13 @@ private fun MethodInsnNode.handleInsnNode(node: MethodNode, owner: String, iHook
     }
 }
 
+/**
+ * 在MethodNode中使用新指令替换insnNode旧指令
+ */
 private fun MethodNode.modify(insnNode: MethodInsnNode, mixinData: MixinData, owner: String) {
         val newMethodInsnNode =
             MethodInsnNode(
-                insnNode.opcode,
+                Opcodes.INVOKESTATIC,  // 这里始终是调用静态方法
                 owner,
                 mixinData.methodName.buildMixinMethodName(),
                 mixinData.descriptor,
