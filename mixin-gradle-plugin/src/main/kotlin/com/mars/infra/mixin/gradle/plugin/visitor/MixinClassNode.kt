@@ -141,11 +141,7 @@ class MixinClassNode(private val classVisitor: ClassVisitor?) : ClassNode(Opcode
                 }
 
                 override fun visitTypeInsn(opcode: Int, type: String?) {
-                    // TODO 测试代码，如果调用Object ProxyInsnChain.proceed方法，则尝试过滤掉两个多余的指令
-                    // TODO 不能直接判断，如果项目中确实存在强转，这里不就出现问题了吗? 待修改。 再次测试了一下，好像没报错...
-
-                    // TODO-gy 果然出现了问题，没道理不让我过啊
-                    // 暂时使用变量进行判断
+                    // TODO 暂时使用变量进行判断
                     if (opcode != Opcodes.CHECKCAST || !hasInvokeProxyInsnChain) {
                         hasInvokeProxyInsnChain = false  // 恢复
                         super.visitTypeInsn(opcode, type)

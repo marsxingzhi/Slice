@@ -18,7 +18,7 @@ public class Login {
     }
 
     public boolean check(String username, String password) {
-        System.out.println("检查 用户名和密码是否 有效");
+        System.out.println("检查用户名和密码是否有效");
         return !TextUtils.isEmpty(username) && !TextUtils.isEmpty(password);
     }
 }

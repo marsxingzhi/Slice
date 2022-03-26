@@ -7,8 +7,10 @@ import org.objectweb.asm.ClassReader
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree.ClassNode
+import org.objectweb.asm.tree.MethodInsnNode
 import java.io.File
 import java.io.InputStream
+import java.lang.reflect.TypeVariable
 import java.util.zip.ZipFile
 
 /**
@@ -27,7 +29,6 @@ object Mixin {
         hashMapOf<String, MixinData>()
     }
 
-    // @Mixin注解标识的类
     val mixinHookClasses by lazy {
         mutableSetOf<String>()
     }
@@ -84,7 +85,7 @@ object Mixin {
 
             // Mixin注解是AnnotationRetention.BINARY，因此使用invisibleAnnotations
             var mixinClass = false
-           classNode.invisibleAnnotations?.forEach { node ->
+            classNode.invisibleAnnotations?.forEach { node ->
                 if (node.desc == ANNOTATION_MIXIN) {
                     mixinClass = true
                     mixinHookClasses.add(classNode.name)
@@ -155,14 +156,22 @@ private fun ClassNode.handleNode() {
             }
         }
 
-        // 遍历方法体，找到是否有调用ProxyInsnChain.proceed方法
-//        methodNode.instructions.iterator().forEach {
-//            if (it is MethodInsnNode
-//                && it.owner == PROXY_INSN_CHAIN_NAME
-//                && it.name == "proceed") {
-//                // 修改指令对应的opcode，然后在插入的时候，判断opcode，如果等于OPCODE_PROCEED，那么则插入原指令
-//                it.opcode = Mixin.OPCODE_PROCEED
-//            }
-//        }
+        methodNode.instructions.iterator().forEach {
+            if (it is MethodInsnNode
+                && it.owner == PROXY_INSN_CHAIN_NAME
+                && it.name == "proceed"
+            ) {
+                val returnType = Type.getReturnType(methodNode.desc)
+                /**
+                 * ProxyInsnChain.proceed是有返回值的，
+                 * 如果目标方法是不带返回值的，则需要移除hook方法中的POP指令
+                 */
+                if (returnType == Type.VOID_TYPE) {
+                    if (it.next.opcode == Opcodes.POP) {
+                        methodNode.instructions.remove(it.next)
+                    }
+                }
+            }
+        }
     }
 }

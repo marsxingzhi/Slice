@@ -20,7 +20,7 @@ class LoginMixin {
     /**
      * 方案一
      */
-    @Proxy(owner = "com/mars/infra/mixin/lib/Login", name = "login", isStatic = false)
+//    @Proxy(owner = "com/mars/infra/mixin/lib/Login", name = "login", isStatic = false)
     public static void hookLogin(Object obj, String username, String password) {
         System.out.println("hookLogin invoke.");
         Login login = (Login) obj;
@@ -34,11 +34,14 @@ class LoginMixin {
     /**
      * 方案二
      */
+    @Proxy(owner = "com/mars/infra/mixin/lib/Login", name = "login", isStatic = false)
     public static void hookLogin_2(Object obj, String username, String password) {
         System.out.println("hookLogin_2 invoke.");
         Login login = (Login) obj;
         if (login.check(username, password)) {
-            ProxyInsnChain.proceed(obj, username, password);
+//            ProxyInsnChain.proceed(obj, username, password);
+            // TODO 上述强转一下，这里传入login，而不是obj。这里需要优化，不需要强转也能支持，因为不一定可以拿到Login这个类！依赖不到
+            ProxyInsnChain.proceed(login, username, password);
         } else {
             Log.e("Login", "用户名和密码不正确.");
         }
