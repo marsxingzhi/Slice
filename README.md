@@ -25,7 +25,10 @@ class Main {
 - [ ] 先考虑调用方法B
 - [ ] 然后再考虑在类A中添加方法B，类A的方法A就直接调用类A中的方法B
 - [ ] 方法A已经被hook了，不能在其他地方再次hook方法A，需要做检查
-- [ ] 类B是不应该打进apk中的
+- [ ] 类B是不应该打进apk中的    
+
+[更新日志](https://github.com/JohnnySwordMan/Mixin/blob/develop/UPDATE.md)
+
 
 ### 石器时代       
 **任务：** 修改LoginService#login方法中的Log.e方法，替换成Logger.superE
