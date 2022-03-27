@@ -21,4 +21,42 @@ public class Login {
         System.out.println("检查用户名和密码是否有效");
         return !TextUtils.isEmpty(username) && !TextUtils.isEmpty(password);
     }
+
+    public static void logout(int code) {
+        System.out.println("执行 Login#logout, code = " + code);
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static boolean logout_2(int code) {
+        System.out.println("执行 Login#logout_2, code = " + code);
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return code == 1;
+    }
+
+    public void logout_3(int code) {
+        System.out.println("执行 Login#logout_3, code = " + code);
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean logout_4(int code) {
+        System.out.println("执行 Login#logout_4, code = " + code);
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return code == 1;
+    }
 }

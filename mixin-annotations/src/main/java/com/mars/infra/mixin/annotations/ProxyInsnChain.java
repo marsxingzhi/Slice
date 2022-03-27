@@ -34,10 +34,25 @@ package com.mars.infra.mixin.annotations;
  * il.add(new MethodInsnNode(INVOKESTATIC, "run/test/ProxyInsnChain", "proceed1", "(Ljava/lang/String;Ljava/lang/String;)I", false));
  *
  * 因此如果改成方法一，那么就多了两个指令，将这两个指令过滤掉，就不报错了！
+ *
+ * TODO
+ * 1. 优化proceed方法
+ *
+ * public static Object proceed(Object...params) {
+ *      return null;
+ * }
  */
 public class ProxyInsnChain {
 
-    // test two params
+
+    public static Object proceed(int param) {
+        return null;
+    }
+
+    public static Object proceed(Object obj, int param) {
+        return null;
+    }
+
     public static Object proceed(String param1, String param2) {
         return null;
     }
