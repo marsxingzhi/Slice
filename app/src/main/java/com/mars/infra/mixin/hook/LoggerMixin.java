@@ -14,7 +14,7 @@ class LoggerMixin {
     /**
      * hook Logger.printL方法
      */
-    @Proxy(owner = "com/mars/infra/mixin/lib/Logger", name = "printL", isStatic = true)
+    @Proxy(owner = "com.mars.infra.mixin.lib.Logger", name = "printL", isStatic = true)
     public static long hookPrintL(String tag, String msg) {
         long res = -1;
          try {
@@ -25,7 +25,7 @@ class LoggerMixin {
          return res;
     }
 
-    @Proxy(owner = "com/mars/infra/mixin/lib/Logger", name = "printLForce", isStatic = true)
+    @Proxy(owner = "com.mars.infra.mixin.lib.Logger", name = "printLForce", isStatic = true)
     public static long hookPrintLForce(String tag, String msg) {
         long res = -1;
         try {

@@ -34,7 +34,7 @@ class LoginMixin {
     /**
      * 方案二
      */
-    @Proxy(owner = "com/mars/infra/mixin/lib/Login", name = "login", isStatic = false)
+    @Proxy(owner = "com.mars.infra.mixin.lib.Login", name = "login", isStatic = false)
     public static void hookLogin_2(Object obj, String username, String password) {
         System.out.println("hookLogin_2 invoke.");
         Login login = (Login) obj;

@@ -17,3 +17,7 @@ fun checkHookMethodExist(owner: String, name: String,
         success.invoke(key)
     }
 }
+
+fun String.getInternalName(): String {
+    return this.replace(".", "/")
+}

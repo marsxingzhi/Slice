@@ -126,7 +126,7 @@ private fun ClassNode.handleNode() {
             if (annotationNode.desc == ANNOTATION_PROXY) {
                 // TODO 粗糙实现，默认是严格按照顺序的
                 var index = 0
-                val owner = annotationNode.values[++index] as String
+                val owner = (annotationNode.values[++index] as String).getInternalName()
                 index++
                 val name = annotationNode.values[++index] as String
                 index++
