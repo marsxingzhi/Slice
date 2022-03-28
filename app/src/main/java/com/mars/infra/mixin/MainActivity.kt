@@ -18,6 +18,8 @@ class MainActivity : AppCompatActivity() {
         mBtnStartLogin = findViewById(R.id.btn_start_login)
         mBtnLogout = findViewById(R.id.btn_logout)
 
+        LoginService.init("zhangsan", "123456", 100)
+
         mBtnStartLogin.setOnClickListener {
             LoginService.startLogin()
         }

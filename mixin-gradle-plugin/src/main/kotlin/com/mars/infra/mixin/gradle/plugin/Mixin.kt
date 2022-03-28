@@ -2,6 +2,8 @@ package com.mars.infra.mixin.gradle.plugin
 
 import com.android.build.api.transform.JarInput
 import com.android.build.api.transform.TransformInvocation
+import com.mars.infra.mixin.gradle.plugin.core.desugarInstruction
+import com.mars.infra.mixin.gradle.plugin.ext.*
 import com.mars.infra.mixin.gradle.plugin.visitor.MixinCollectClassVisitor
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.Opcodes
@@ -10,7 +12,6 @@ import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.MethodInsnNode
 import java.io.File
 import java.io.InputStream
-import java.lang.reflect.TypeVariable
 import java.util.zip.ZipFile
 
 /**
@@ -122,8 +123,12 @@ private fun ClassNode.handleNode() {
     }.forEach { methodNode ->
         val mixinData = MixinData(name, methodNode.name, methodNode.desc, methodNode = methodNode)
 
+        // 只有Proxy注解标识的方法，才是hook方法
+        var isHookMethod = false
+
         methodNode.invisibleAnnotations?.forEach { annotationNode ->
             if (annotationNode.desc == ANNOTATION_PROXY) {
+                isHookMethod = true
                 // TODO 粗糙实现，默认是严格按照顺序的
                 var index = 0
                 val owner = (annotationNode.values[++index] as String).getInternalName()
@@ -156,19 +161,27 @@ private fun ClassNode.handleNode() {
             }
         }
 
-        methodNode.instructions.iterator().forEach {
-            if (it is MethodInsnNode
-                && it.owner == PROXY_INSN_CHAIN_NAME
-                && it.name == "proceed"
-            ) {
-                val returnType = Type.getReturnType(methodNode.desc)
-                /**
-                 * ProxyInsnChain.proceed是有返回值的，
-                 * 如果目标方法是不带返回值的，则需要移除hook方法中的POP指令
-                 */
-                if (returnType == Type.VOID_TYPE) {
-                    if (it.next.opcode == Opcodes.POP) {
-                        methodNode.instructions.remove(it.next)
+        isHookMethod.yes {
+            methodNode.instructions.iterator().forEach {
+                if (it is MethodInsnNode
+                    && it.owner == PROXY_INSN_CHAIN_NAME
+                    && (it.name == "proceed" || it.name == "handle")
+                ) {
+                    val returnType = Type.getReturnType(methodNode.desc)
+                    /**
+                     * ProxyInsnChain.proceed是有返回值的，
+                     * 如果目标方法是不带返回值的，则需要移除hook方法中的POP指令
+                     */
+                    if (returnType == Type.VOID_TYPE) {
+                        if (it.next.opcode == Opcodes.POP) {
+                            methodNode.instructions.remove(it.next)
+                        }
+                    }
+
+                    if (it.name == "handle") {
+                        val argumentTypes = Type.getArgumentTypes(methodNode.desc)
+                        // TODO 处理指令
+                        methodNode.desugarInstruction(argumentTypes, it)
                     }
                 }
             }

@@ -1,6 +1,8 @@
 package com.mars.infra.mixin.gradle.plugin.visitor
 
 import com.mars.infra.mixin.gradle.plugin.*
+import com.mars.infra.mixin.gradle.plugin.ext.ANNOTATION_PROXY
+import com.mars.infra.mixin.gradle.plugin.ext.checkHookMethodExist
 import org.objectweb.asm.AnnotationVisitor
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.MethodVisitor

@@ -7,6 +7,17 @@ import android.text.TextUtils;
  */
 public class Login {
 
+    public static void init(String username, String password, int code) {
+        System.out.println("Login#init start");
+        System.out.println("打印参数： username = " + username + ", password = " + password + ", code = " + code);
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Login#init done");
+    }
+
     public void login(String username, String password) {
         System.out.println("开始登录~");
         try {

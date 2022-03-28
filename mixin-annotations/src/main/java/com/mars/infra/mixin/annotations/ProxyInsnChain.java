@@ -37,6 +37,7 @@ package com.mars.infra.mixin.annotations;
  *
  * TODO
  * 1. 优化proceed方法
+ * 2. 修改名字
  *
  * public static Object proceed(Object...params) {
  *      return null;
@@ -44,6 +45,10 @@ package com.mars.infra.mixin.annotations;
  */
 public class ProxyInsnChain {
 
+    // [Ljava/lang/Object;)Ljava/lang/Object;
+    public static Object handle(Object... args) {
+        return null;
+    }
 
     public static Object proceed(int param) {
         return null;

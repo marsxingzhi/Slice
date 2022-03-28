@@ -1,4 +1,6 @@
-package com.mars.infra.mixin.gradle.plugin
+package com.mars.infra.mixin.gradle.plugin.ext
+
+import com.mars.infra.mixin.gradle.plugin.Mixin
 
 /**
  * Created by Mars on 2022/3/21

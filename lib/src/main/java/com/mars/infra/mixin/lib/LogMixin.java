@@ -9,7 +9,7 @@ import com.mars.infra.mixin.annotations.ProxyInsnChain;
 /**
  * Created by Mars on 2022/3/22
  */
-@Mixin
+//@Mixin
 class LogMixin {
 
     @Proxy(owner = "android.util.Log", name = "e", isStatic = true)

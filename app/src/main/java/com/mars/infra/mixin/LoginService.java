@@ -9,6 +9,11 @@ import com.mars.infra.mixin.lib.Login;
  */
 public class LoginService {
 
+
+    public static void init(String username, String password, int code) {
+        Login.init(username, password, code);
+    }
+
     /**
      * aop替换Log.e方法，替换成Logger.superE
      */

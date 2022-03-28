@@ -2,6 +2,9 @@ package com.mars.infra.mixin.gradle.plugin.visitor
 
 import com.mars.infra.mixin.gradle.plugin.*
 import com.mars.infra.mixin.gradle.plugin.core.MethodTransformer
+import com.mars.infra.mixin.gradle.plugin.ext.PROXY_INSN_CHAIN_NAME
+import com.mars.infra.mixin.gradle.plugin.ext.buildMixinMethodName
+import com.mars.infra.mixin.gradle.plugin.ext.no
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
@@ -192,7 +195,7 @@ private fun MethodInsnNode.handleInsnNode(node: MethodNode, owner: String, iHook
             && this.name == proxyData?.name
             && this.desc == proxyData?.descriptor) {
             iHook.hook(this, mixinData)
-            node.modify(this, mixinData, owner)
+//            node.modify(this, mixinData, owner)
         }
     }
 }

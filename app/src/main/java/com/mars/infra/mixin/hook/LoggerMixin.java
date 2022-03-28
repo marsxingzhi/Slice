@@ -7,7 +7,7 @@ import com.mars.infra.mixin.annotations.ProxyInsnChain;
 /**
  * Created by Mars on 2022/3/24
  */
-@Mixin
+//@Mixin
 class LoggerMixin {
 
 

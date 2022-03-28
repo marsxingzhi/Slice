@@ -1,4 +1,4 @@
-package com.mars.infra.mixin.gradle.plugin
+package com.mars.infra.mixin.gradle.plugin.ext
 
 /**
  * Created by Mars on 2022/3/15
