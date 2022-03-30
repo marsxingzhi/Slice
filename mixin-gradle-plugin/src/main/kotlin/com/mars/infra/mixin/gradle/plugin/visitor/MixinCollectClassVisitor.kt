@@ -1,8 +1,10 @@
 package com.mars.infra.mixin.gradle.plugin.visitor
 
-import com.mars.infra.mixin.gradle.plugin.*
+import com.mars.infra.mixin.gradle.plugin.core.Mixin
 import com.mars.infra.mixin.gradle.plugin.ext.ANNOTATION_PROXY
 import com.mars.infra.mixin.gradle.plugin.ext.checkHookMethodExist
+import com.mars.infra.mixin.gradle.plugin.model.MixinData
+import com.mars.infra.mixin.gradle.plugin.model.ProxyData
 import org.objectweb.asm.AnnotationVisitor
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.MethodVisitor
@@ -63,7 +65,8 @@ class MixinCollectAdapter(private val owner: String?,
 }
 
 class MixinCollectAnnotation(annotationVisitor: AnnotationVisitor?,
-                             private val mixinData: MixinData): AnnotationVisitor(Opcodes.ASM7, annotationVisitor) {
+                             private val mixinData: MixinData
+): AnnotationVisitor(Opcodes.ASM7, annotationVisitor) {
 
     private val proxyData = ProxyData()
 

@@ -1,4 +1,4 @@
-package com.mars.infra.mixin.gradle.plugin
+package com.mars.infra.mixin.gradle.plugin.model
 
 import org.objectweb.asm.tree.MethodNode
 

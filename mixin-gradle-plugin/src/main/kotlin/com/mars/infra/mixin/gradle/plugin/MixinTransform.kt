@@ -2,6 +2,7 @@ package com.mars.infra.mixin.gradle.plugin
 
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
+import com.mars.infra.mixin.gradle.plugin.core.Mixin
 import com.mars.infra.mixin.gradle.plugin.ext.no
 import com.mars.infra.mixin.gradle.plugin.ext.yes
 import com.mars.infra.mixin.gradle.plugin.visitor.MixinClassNode

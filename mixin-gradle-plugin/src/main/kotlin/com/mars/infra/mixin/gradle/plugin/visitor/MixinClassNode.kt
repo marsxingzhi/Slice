@@ -1,10 +1,11 @@
 package com.mars.infra.mixin.gradle.plugin.visitor
 
-import com.mars.infra.mixin.gradle.plugin.*
 import com.mars.infra.mixin.gradle.plugin.core.MethodTransformer
+import com.mars.infra.mixin.gradle.plugin.core.Mixin
 import com.mars.infra.mixin.gradle.plugin.ext.PROXY_INSN_CHAIN_NAME
 import com.mars.infra.mixin.gradle.plugin.ext.buildMixinMethodName
 import com.mars.infra.mixin.gradle.plugin.ext.no
+import com.mars.infra.mixin.gradle.plugin.model.MixinData
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
@@ -54,14 +55,14 @@ class MixinClassNode(private val classVisitor: ClassVisitor?) : ClassNode(Opcode
 
             /**
              * 原：mixinData.methodNode?.accept(hookMethodNode)
-             * 但是，如果遇到ProxyInsnChain.proceed方法，需要将hooked method对应的指令写入
+             * 但是，如果遇到MixinProxyInsn.proceed方法，需要将hooked method对应的指令写入
              *
              * 这里将hookLogW中的指令写入了_generate_hookLogW_mixin()方法体中，
-             * 但是在写入过程中如果遇到ProxyInsnChain.proceed对应的指令需要将LogW对应的方法指令写入（原指令）
+             * 但是在写入过程中如果遇到MixinProxyInsn.proceed对应的指令需要将LogW对应的方法指令写入（原指令）
              */
             mixinData.methodNode?.accept(object: MethodVisitor(Opcodes.ASM7, hookMethodNode) {
 
-                private var hasInvokeProxyInsnChain = false
+                private var hasInvokeMixinProxyInsn = false
 
                 // 美式方案，虽然粗糙了些，但是可以用
                 private fun filter(opcode: Int, owner: String?, name: String?, descriptor: String?): Boolean {
@@ -129,14 +130,14 @@ class MixinClassNode(private val classVisitor: ClassVisitor?) : ClassNode(Opcode
                     descriptor: String?,
                     isInterface: Boolean
                 ) {
-                    // TODO 测试代码，如果调用Object ProxyInsnChain.proceed方法，则尝试过滤掉两个多余的指令
-                    if (filter(opcode, owner, name, descriptor)) {
-                        return
-                    }
+                    // TODO 测试代码，如果调用Object MixinProxyInsn.proceed方法，则尝试过滤掉两个多余的指令
+//                    if (filter(opcode, owner, name, descriptor)) {
+//                        return
+//                    }
 
                     if (owner == PROXY_INSN_CHAIN_NAME) {
                         // 原指令写入
-                        hasInvokeProxyInsnChain = true
+                        hasInvokeMixinProxyInsn = true
                         insnNode.accept(mv)
                     } else {
                         super.visitMethodInsn(opcode, owner, name, descriptor, isInterface)
@@ -145,8 +146,8 @@ class MixinClassNode(private val classVisitor: ClassVisitor?) : ClassNode(Opcode
 
                 override fun visitTypeInsn(opcode: Int, type: String?) {
                     // TODO 暂时使用变量进行判断
-                    if (opcode != Opcodes.CHECKCAST || !hasInvokeProxyInsnChain) {
-                        hasInvokeProxyInsnChain = false  // 恢复
+                    if (opcode != Opcodes.CHECKCAST || !hasInvokeMixinProxyInsn) {
+                        hasInvokeMixinProxyInsn = false  // 恢复
                         super.visitTypeInsn(opcode, type)
                     }
                 }
@@ -195,7 +196,7 @@ private fun MethodInsnNode.handleInsnNode(node: MethodNode, owner: String, iHook
             && this.name == proxyData?.name
             && this.desc == proxyData?.descriptor) {
             iHook.hook(this, mixinData)
-//            node.modify(this, mixinData, owner)
+            node.modify(this, mixinData, owner)
         }
     }
 }

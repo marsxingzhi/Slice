@@ -41,11 +41,11 @@ public class LoginService {
             e.printStackTrace();
         }
 
-//        Login.logout(1);
-//        Login.logout_2(1);
+        Login.logout(1);
+        Login.logout_2(1);
 
         Login login = new Login();
-//        login.logout_3(1);
+        login.logout_3(1);
         login.logout_4(1);
 
         Log.w("LoginService", "end logout");
