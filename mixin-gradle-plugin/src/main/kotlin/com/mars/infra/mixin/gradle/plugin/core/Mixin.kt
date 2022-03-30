@@ -12,6 +12,7 @@ import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree.ClassNode
 import org.objectweb.asm.tree.MethodInsnNode
+import org.objectweb.asm.tree.TypeInsnNode
 import java.io.File
 import java.io.InputStream
 import java.util.zip.ZipFile
@@ -177,6 +178,44 @@ private fun ClassNode.handleNode() {
                     if (returnType == Type.VOID_TYPE) {
                         if (it.next.opcode == Opcodes.POP) {
                             methodNode.instructions.remove(it.next)
+                        }
+                    } else {
+                        /**
+                         * 示例一：
+                         * boolean res = (boolean) MixinProxyInsn.invoke(code);
+                         * return res;
+                         *
+                         * 对应指令如下：
+                         * MethodInsnNode(INVOKESTATIC, "run/test/MixinProxyInsn", "invoke", "([Ljava/lang/Object;)Ljava/lang/Object;", false)
+                         * TypeInsnNode(CHECKCAST, "java/lang/Boolean")
+                         * MethodInsnNode(INVOKEVIRTUAL, "java/lang/Boolean", "booleanValue", "()Z", false)
+                         *
+                         * 示例二：
+                         * Boolean res = (Boolean) ProxyInsnChain.handle(username, password, code);
+                         *
+                         * 对应的指令如下：
+                         * MethodInsnNode(INVOKESTATIC, "run/test/MixinProxyInsn", "invoke", "([Ljava/lang/Object;)Ljava/lang/Object;", false)
+                         * TypeInsnNode(CHECKCAST, "java/lang/Boolean")
+                         *
+                         * 使用者不同的行为会出现可能会有拆箱指令，可能也没有拆箱指令。
+                         * 因此，Mixin中为了统一判断，则不采取删除指令(无法知道要不要删除拆箱的)，而是采取新增装箱的指令
+                         * 1. 删除CHECKCAST指令
+                         * 2. 添加装箱指令
+                         *
+                         */
+                        val nextInsnNode = it.next
+                        if (nextInsnNode.opcode == Opcodes.CHECKCAST && nextInsnNode is TypeInsnNode) {
+                            val boxType = typeMap[returnType]
+                            boxType?.let { boxType ->
+                                val boxInsnNode = MethodInsnNode(
+                                    Opcodes.INVOKESTATIC,
+                                    boxType.internalName,
+                                    "valueOf",
+                                    "(${returnType.descriptor})${boxType.descriptor}",
+                                    false)
+                                methodNode.instructions.insert(it, boxInsnNode)
+                            }
+                            methodNode.instructions.remove(nextInsnNode)
                         }
                     }
 

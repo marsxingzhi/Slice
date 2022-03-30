@@ -29,7 +29,7 @@ class LoginMixin {
     }
 
 
-//    @Proxy(owner = "com/mars/infra/mixin/lib/Login", name = "login", isStatic = false)
+    @Proxy(owner = "com/mars/infra/mixin/lib/Login", name = "login", isStatic = false)
     public static void hookLogin(Object obj, String username, String password) {
         System.out.println("hookLogin invoke.");
         Login login = (Login) obj;
@@ -41,7 +41,7 @@ class LoginMixin {
     }
 
 
-    @Proxy(owner = "com.mars.infra.mixin.lib.Login", name = "login", isStatic = false)
+//    @Proxy(owner = "com.mars.infra.mixin.lib.Login", name = "login", isStatic = false)
     public static void hookLogin_2(Object obj, String username, String password) {
         System.out.println("hookLogin_2 invoke.");
         Login login = (Login) obj;
@@ -61,10 +61,9 @@ class LoginMixin {
         System.out.println("LoginMixin#hookLogout, logout success");
     }
 
-//    @Proxy(owner = "com.mars.infra.mixin.lib.Login", name = "logout_2", isStatic = true)
+    @Proxy(owner = "com.mars.infra.mixin.lib.Login", name = "logout_2", isStatic = true)
     public static boolean hookLogout_2(int code) {
         System.out.println("LoginMixin#hookLogout_2, invoke hookLogout, code = " + code);
-        // TODO 强转有问题
         boolean res = (boolean) MixinProxyInsn.invoke(code);
         System.out.println("LoginMixin#hookLogout_2, logout success");
         return res;
@@ -78,11 +77,10 @@ class LoginMixin {
         System.out.println("LoginMixin#hookLogout_3, logout success");
     }
 
-//    @Proxy(owner = "com.mars.infra.mixin.lib.Login", name = "logout_4", isStatic = false)
+    @Proxy(owner = "com.mars.infra.mixin.lib.Login", name = "logout_4", isStatic = false)
     public static boolean hookLogout_4(Object obj, int code) {
         System.out.println("LoginMixin#hookLogout_4, invoke hookLogout_4, code = " + code);
         Login login = (Login) obj;
-        // TODO 强转有问题
         boolean res = (boolean) MixinProxyInsn.invoke(login, code);
         System.out.println("LoginMixin#hookLogout_4, logout success");
         return res;
