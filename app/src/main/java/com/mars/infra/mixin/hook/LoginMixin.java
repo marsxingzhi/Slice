@@ -46,9 +46,7 @@ class LoginMixin {
         System.out.println("hookLogin_2 invoke.");
         Login login = (Login) obj;
         if (login.check(username, password)) {
-//            MixinProxyInsn.proceed(obj, username, password);
-            // TODO 上述强转一下，这里传入login，而不是obj。这里需要优化，不需要强转也能支持，因为不一定可以拿到Login这个类！依赖不到
-            MixinProxyInsn.invoke(login, username, password);
+            MixinProxyInsn.invoke(obj, username, password);
         } else {
             Log.e("Login", "用户名和密码不正确.");
         }
@@ -72,16 +70,22 @@ class LoginMixin {
     @Proxy(owner = "com.mars.infra.mixin.lib.Login", name = "logout_3", isStatic = false)
     public static void hookLogout_3(Object obj, int code) {
         System.out.println("LoginMixin#hookLogout_3, invoke hookLogout_3, code = " + code);
-        Login login = (Login) obj;
-        MixinProxyInsn.invoke(login, code);
+//        Login login = (Login) obj;
+        MixinProxyInsn.invoke(obj, code);
         System.out.println("LoginMixin#hookLogout_3, logout success");
     }
 
+    /**
+     *
+     * @param obj
+     * @param code
+     * @return
+     */
     @Proxy(owner = "com.mars.infra.mixin.lib.Login", name = "logout_4", isStatic = false)
     public static boolean hookLogout_4(Object obj, int code) {
         System.out.println("LoginMixin#hookLogout_4, invoke hookLogout_4, code = " + code);
-        Login login = (Login) obj;
-        boolean res = (boolean) MixinProxyInsn.invoke(login, code);
+//        Login login = (Login) obj;
+        boolean res = (boolean) MixinProxyInsn.invoke(obj, code);
         System.out.println("LoginMixin#hookLogout_4, logout success");
         return res;
     }

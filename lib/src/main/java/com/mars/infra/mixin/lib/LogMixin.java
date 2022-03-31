@@ -2,13 +2,14 @@ package com.mars.infra.mixin.lib;
 
 import android.util.Log;
 
+import com.mars.infra.mixin.annotations.Mixin;
 import com.mars.infra.mixin.annotations.Proxy;
 import com.mars.infra.mixin.annotations.MixinProxyInsn;
 
 /**
  * Created by Mars on 2022/3/22
  */
-//@Mixin
+@Mixin
 class LogMixin {
 
     @Proxy(owner = "android.util.Log", name = "e", isStatic = true)

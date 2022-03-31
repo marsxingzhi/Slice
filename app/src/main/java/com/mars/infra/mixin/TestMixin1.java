@@ -6,7 +6,7 @@ import com.mars.infra.mixin.annotations.Proxy;
 /**
  * Created by Mars on 2022/3/21
  */
-//@Mixin
+@Mixin
 class TestMixin1 {
 
     @Proxy(owner = "android.util.Log", name = "i", isStatic = true)

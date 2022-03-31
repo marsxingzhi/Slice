@@ -152,7 +152,7 @@ private fun ClassNode.handleNode() {
                 realDescriptor += ")"
                 realDescriptor += returnType.descriptor
 
-                mixinData.proxyData = ProxyData(owner, name, realDescriptor)
+                mixinData.proxyData = ProxyData(owner, name, realDescriptor, isStatic)
 
                 Mixin.mixinDataList.add(mixinData)
 
@@ -221,7 +221,7 @@ private fun ClassNode.handleNode() {
 
                     if (it.name == "invoke") {
                         val argumentTypes = Type.getArgumentTypes(methodNode.desc)
-                        methodNode.desugarInstruction(argumentTypes, it)
+                        methodNode.desugarInstruction(argumentTypes, it, mixinData.proxyData!!)
                     }
                 }
             }

@@ -1,12 +1,13 @@
 package com.mars.infra.mixin.hook;
 
+import com.mars.infra.mixin.annotations.Mixin;
 import com.mars.infra.mixin.annotations.Proxy;
 import com.mars.infra.mixin.annotations.MixinProxyInsn;
 
 /**
  * Created by Mars on 2022/3/24
  */
-//@Mixin
+@Mixin
 class LoggerMixin {
 
 

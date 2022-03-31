@@ -4,6 +4,7 @@ import com.mars.infra.mixin.gradle.plugin.ext.TYPE_ANY
 import com.mars.infra.mixin.gradle.plugin.ext.boxNameMap
 import com.mars.infra.mixin.gradle.plugin.ext.getInternalName
 import com.mars.infra.mixin.gradle.plugin.ext.typeMap
+import com.mars.infra.mixin.gradle.plugin.model.ProxyData
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
 import org.objectweb.asm.tree.*
@@ -35,7 +36,7 @@ import org.objectweb.asm.tree.*
 
  * 逆序查找，不清楚前面有多少逻辑，那么就找到离handleInsnNode最近的一个ANEWARRAY指令
  */
-fun MethodNode.desugarInstruction(argumentTypes: Array<Type>?, handleInsnNode: MethodInsnNode) {
+fun MethodNode.desugarInstruction(argumentTypes: Array<Type>?, handleInsnNode: MethodInsnNode, proxyData: ProxyData) {
     // TODO 暂不支持无参的
     if (argumentTypes == null || argumentTypes.isEmpty()) {
         throw Exception("暂不支持无参函数的hook")
@@ -84,6 +85,19 @@ fun MethodNode.desugarInstruction(argumentTypes: Array<Type>?, handleInsnNode: M
             // dupHead此时等于InsnNode(AASTORE)
             if (i != argumentTypes.size - 1 && headNode == lastAASTOREInsn) {
                 throw Exception("handle方法出现异常, errorCode = 6")
+            }
+
+            // 强转指令，在调用MixinProxyInsn的invoke方法之前，如果是实例方法，需要将ALOAD_0的值进行强转
+            if (i == 0 && !proxyData.isStatic) {
+                val checkCastInsnNode = TypeInsnNode(Opcodes.CHECKCAST, proxyData.owner)
+                //        il.add(new InsnNode(DUP));
+                //        il.add(new InsnNode(ICONST_0));
+                //        il.add(new VarInsnNode(ALOAD, 0));
+                //        il.add(new TypeInsnNode(CHECKCAST, "run/test/Login"));
+                //        il.add(new InsnNode(AASTORE));
+
+//                instructions.insert(handleInsnNode.previous, checkCastInsnNode)
+                instructions.insert(headNode.previous, checkCastInsnNode)  // 不是在handleInsnNode指令之前，而是在AASTORE之前
             }
 
             // 存在自动装箱，因此需要添加拆箱的指令。上述注释的第三段，就有自动装箱的逻辑
