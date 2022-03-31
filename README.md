@@ -3,7 +3,10 @@
 AOP框架，使用注解标识需要aop的方法  
 
 ## USAGE   
-详见[USAGE](https://github.com/JohnnySwordMan/Mixin/blob/develop/USAGE.md)
+详见 [USAGE](https://github.com/JohnnySwordMan/Mixin/blob/main/USAGE.md)
+
+## 分析     
+详见 [ANALYZE](https://github.com/JohnnySwordMan/Mixin/blob/main/ANALYZE.md)
 
 ## TODO   
 说明：

@@ -191,7 +191,7 @@ private fun ClassNode.handleNode() {
                          * MethodInsnNode(INVOKEVIRTUAL, "java/lang/Boolean", "booleanValue", "()Z", false)
                          *
                          * 示例二：
-                         * Boolean res = (Boolean) ProxyInsnChain.handle(username, password, code);
+                         * Boolean res = (Boolean) MixinProxyInsn.handle(username, password, code);
                          *
                          * 对应的指令如下：
                          * MethodInsnNode(INVOKESTATIC, "run/test/MixinProxyInsn", "invoke", "([Ljava/lang/Object;)Ljava/lang/Object;", false)
