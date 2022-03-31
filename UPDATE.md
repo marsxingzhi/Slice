@@ -1,5 +1,9 @@
 ### 更新日志     
 
+#### 3.31   
+tag: v4.0 
+1、 方法替换完成
+
 #### 3.27  
 1、@Proxy注解元素owner改成全限定名，而不是使用internal name    
 2、MixinProxyInsn新增重载方法，支持int类型（有限个数）

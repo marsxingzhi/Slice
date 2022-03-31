@@ -2,6 +2,9 @@
 
 AOP框架，使用注解标识需要aop的方法  
 
+## USAGE   
+详见[USAGE](https://github.com/JohnnySwordMan/Mixin/blob/develop/USAGE.md)
+
 ## TODO   
 说明：
 方法A：表示当前执行的方法，需要被替换     
