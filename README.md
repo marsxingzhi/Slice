@@ -27,11 +27,12 @@ class Main {
 
 - [ ] 具体的ClassVisitor或者Transform抽象出来，单独作为一个模块
 - [x] 替换指定类中的指定方法
-- [ ] 方法B方法不固定，即通过注解标识
+- [x] 方法B方法不固定，即通过注解标识
 - [ ] 先考虑调用方法B
 - [ ] 然后再考虑在类A中添加方法B，类A的方法A就直接调用类A中的方法B
-- [ ] 方法A已经被hook了，不能在其他地方再次hook方法A，需要做检查
-- [ ] 类B是不应该打进apk中的    
+- [x] 方法A已经被hook了，不能在其他地方再次hook方法A，需要做检查
+- [x] 类B是不应该打进apk中的  
+- [ ] 添加scope，需求：A、B模块都调用了登录sdk，但是只想修改A模块中的调用逻辑
 
 [更新日志](https://github.com/JohnnySwordMan/Mixin/blob/develop/UPDATE.md)
 

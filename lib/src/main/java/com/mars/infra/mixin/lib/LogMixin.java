@@ -26,7 +26,7 @@ class LogMixin {
      */
     @Proxy(owner = "android.util.Log", name = "w", isStatic = true)
     public static int hookLogW(String tag, String msg) {
-        return (int) MixinProxyInsn.proceed(tag, msg + " ---> LogMixin hookLogW hook success.");
+        return (int) MixinProxyInsn.invoke(tag, msg + " ---> LogMixin hookLogW hook success.");
     }
 
 }

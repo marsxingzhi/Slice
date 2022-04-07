@@ -18,7 +18,7 @@ class LoggerMixin {
     public static long hookPrintL(String tag, String msg) {
         long res = -1;
          try {
-             res =  (long) MixinProxyInsn.proceed(tag, msg);
+             res =  (long) MixinProxyInsn.invoke(tag, msg);
          } catch (Exception e) {
              e.printStackTrace();
          }
@@ -29,7 +29,7 @@ class LoggerMixin {
     public static long hookPrintLForce(String tag, String msg) {
         long res = -1;
         try {
-            res =  (long) MixinProxyInsn.proceed(tag, msg + " ---> has hooked success");
+            res =  (long) MixinProxyInsn.invoke(tag, msg + " ---> has hooked success");
         } catch (Exception e) {
             e.printStackTrace();
         }

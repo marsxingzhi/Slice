@@ -22,8 +22,6 @@ import java.util.zip.ZipFile
  */
 object Mixin {
 
-    const val OPCODE_PROCEED = -0x001
-
     @Deprecated("存在问题，无法判断是否hook相同的方法")
     val mixinDataList by lazy {
         arrayListOf<MixinData>()

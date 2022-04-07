@@ -43,6 +43,9 @@ class MixinTransform : Transform() {
         }
 
         Mixin.collectHookInfo(transformInvocation)
+        Mixin.mixinHookClasses.forEach {
+            println("mixinHookClasses = $it")
+        }
 
         transformInvocation.inputs.forEach {
             it.directoryInputs.forEach { directoryInput ->
@@ -52,7 +55,7 @@ class MixinTransform : Transform() {
                     directoryInput.scopes,
                     Format.DIRECTORY
                 )
-                processDir(directoryInput.file, output)
+                processDir(directoryInput, directoryInput.file, output)
             }
             it.jarInputs.forEach { jarInput ->
                 var destName = jarInput.file.name
@@ -76,24 +79,22 @@ class MixinTransform : Transform() {
         ZipOutputStream(output.outputStream()).use { zos ->
             zos.setMethod(ZipOutputStream.STORED)  // 设置压缩方法，这里仅打包归档存储
             ZipFile(jarInput.file).use { originJar ->
-//                println("MixinTransform---processJar---originJar name = ${originJar.name}")
                 originJar.entries().iterator().forEach { zipEntry ->
                     if (!zipEntry.isDirectory && zipEntry.name.endsWith(".class")) {
-//                        println("MixinTransform---processJar---zipEntry: ${zipEntry.name}")
                         val inputStream = originJar.getInputStream(zipEntry).readBytes()
-                        doTransform(inputStream)?.let {
+                        val classname  = zipEntry.name.substring(0, zipEntry.name.length - 6)
+                        doTransform(classname, inputStream)?.let {
                             zos.writeEntry(zipEntry.name, it)
                         }
                     }
                 }
-//                println("=== ===")
             }
         }
     }
 
 
 
-    private fun processDir(input: File, output: File) {
+    private fun processDir(directoryInput: DirectoryInput, input: File, output: File) {
         output.exists().yes {
             FileUtils.forceDelete(output)
         }
@@ -106,13 +107,12 @@ class MixinTransform : Transform() {
             val destFilePath = it.absolutePath.replace(srcDirPath, destDirPath)
             val destFile = File(destFilePath)
             if (it.isDirectory) {
-                processDir(it, destFile)
+                processDir(directoryInput, it, destFile)
             } else if (it.isFile) {
                 if (it.absolutePath.endsWith(".class")) {
-//                    println("MixinTransform---processDir---inputPath: ${it.absolutePath}")
-//                    println("MixinTransform---processDir---outputPath: ${destFile.absolutePath}")
-//                    println("=== ===")
-                    weave(FileInputStream(it.absolutePath), destFile)
+                    val relativePath = it.toRelativeString(directoryInput.file)
+                    val classname = relativePath.substring(0, relativePath.length - 6)
+                    weave(classname, FileInputStream(it.absolutePath), destFile)
                 } else {
                     FileUtils.copyFile(it, destFile)
                 }
@@ -120,9 +120,9 @@ class MixinTransform : Transform() {
         }
     }
 
-    private fun weave(fileInputStream: FileInputStream, destFile: File) {
+    private fun weave(classname: String, fileInputStream: FileInputStream, destFile: File) {
         fileInputStream.use {
-            doTransform(it.readBytes())?.let { bytes ->
+            doTransform(classname, it.readBytes())?.let { bytes ->
                 val fileOutputStream = FileOutputStream(destFile)
                 bytes.write(fileOutputStream)
             }
@@ -140,15 +140,15 @@ class MixinTransform : Transform() {
      * 但是这里如上设置，在编译期出现Type androidx/transition/TransitionSet not present的错误...
      * TODO 未找到原因，暂时将ClassWriter.COMPUTE_FRAMES改成0
      */
-    private fun doTransform(inputStream: ByteArray): ByteArray? {
+    private fun doTransform(classname: String, inputStream: ByteArray): ByteArray? {
+        if (Mixin.mixinHookClasses.contains(classname)) {
+            println("doTransform---classname = $classname")
+            return null
+        }
         val cr = ClassReader(inputStream)
-//        val cw = ClassWriter(cr, ClassWriter.COMPUTE_FRAMES)
         val cw = ClassWriter(cr, 0)
-
         val mixinClassVisitor = MixinClassVisitor(cw)
-
         val mixinClassNode = MixinClassNode(mixinClassVisitor)
-//        cr.accept(mixinClassVisitor, ClassReader.SKIP_DEBUG or ClassReader.SKIP_FRAMES)
         cr.accept(mixinClassNode, ClassReader.EXPAND_FRAMES)
         return cw.toByteArray()
     }

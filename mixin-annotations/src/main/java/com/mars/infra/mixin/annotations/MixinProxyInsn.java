@@ -35,13 +35,6 @@ package com.mars.infra.mixin.annotations;
  *
  * 因此如果改成方法一，那么就多了两个指令，将这两个指令过滤掉，就不报错了！
  *
- * TODO
- * 1. 优化proceed方法
- * 2. 修改名字
- *
- * public static Object proceed(Object...params) {
- *      return null;
- * }
  */
 public class MixinProxyInsn {
 
@@ -52,18 +45,22 @@ public class MixinProxyInsn {
         return null;
     }
 
+    @Deprecated
     public static Object proceed(int param) {
         return null;
     }
 
+    @Deprecated
     public static Object proceed(Object obj, int param) {
         return null;
     }
 
+    @Deprecated
     public static Object proceed(String param1, String param2) {
         return null;
     }
 
+    @Deprecated
     public static Object proceed(Object obj, String param1, String param2) {
         return null;
     }
