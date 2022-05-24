@@ -21,7 +21,7 @@ class LoginMixin {
     /**
      * hook Login的init静态方法，测试MixinProxyInsn的handle方法
      */
-    @Proxy(owner = "com.mars.infra.mixin.lib.Login", name = "init", isStatic = true)
+//    @Proxy(owner = "com.mars.infra.mixin.lib.Login", name = "init", isStatic = true)
     public static void hookInit(String username, String password, int code) {
         System.out.println("hook Login#init success, start--------------");
         MixinProxyInsn.invoke(username, password, code);
@@ -31,10 +31,9 @@ class LoginMixin {
 
     @Proxy(owner = "com/mars/infra/mixin/lib/Login", name = "login", isStatic = false)
     public static void hookLogin(Object obj, String username, String password) {
-        System.out.println("hookLogin invoke.");
-        Login login = (Login) obj;
+        System.out.println("start hookLogin invoke.");
         if (LoginUtils.check(username, password)) {
-            login.login(username, password);
+            MixinProxyInsn.invoke(obj, username, password);
         } else {
             Log.e("Login", "用户名和密码不正确.");
         }
@@ -52,14 +51,14 @@ class LoginMixin {
         }
     }
 
-    @Proxy(owner = "com.mars.infra.mixin.lib.Login", name = "logout", isStatic = true)
+//    @Proxy(owner = "com.mars.infra.mixin.lib.Login", name = "logout", isStatic = true)
     public static void hookLogout(int code) {
         System.out.println("LoginMixin#hookLogout, invoke hookLogout, code = " + code);
         MixinProxyInsn.invoke(code);
         System.out.println("LoginMixin#hookLogout, logout success");
     }
 
-    @Proxy(owner = "com.mars.infra.mixin.lib.Login", name = "logout_2", isStatic = true)
+//    @Proxy(owner = "com.mars.infra.mixin.lib.Login", name = "logout_2", isStatic = true)
     public static boolean hookLogout_2(int code) {
         System.out.println("LoginMixin#hookLogout_2, invoke hookLogout, code = " + code);
         boolean res = (boolean) MixinProxyInsn.invoke(code);
@@ -67,7 +66,7 @@ class LoginMixin {
         return res;
     }
 
-    @Proxy(owner = "com.mars.infra.mixin.lib.Login", name = "logout_3", isStatic = false)
+//    @Proxy(owner = "com.mars.infra.mixin.lib.Login", name = "logout_3", isStatic = false)
     public static void hookLogout_3(Object obj, int code) {
         System.out.println("LoginMixin#hookLogout_3, invoke hookLogout_3, code = " + code);
 //        Login login = (Login) obj;
@@ -81,7 +80,7 @@ class LoginMixin {
      * @param code
      * @return
      */
-    @Proxy(owner = "com.mars.infra.mixin.lib.Login", name = "logout_4", isStatic = false)
+//    @Proxy(owner = "com.mars.infra.mixin.lib.Login", name = "logout_4", isStatic = false)
     public static boolean hookLogout_4(Object obj, int code) {
         System.out.println("LoginMixin#hookLogout_4, invoke hookLogout_4, code = " + code);
 //        Login login = (Login) obj;
