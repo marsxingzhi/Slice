@@ -1,11 +1,11 @@
-# Mixin  
+# Slice  
 ### 零、TODO    
 - [ ] add scope 
 - [ ] optimize process dir/jar
 - [x] split transform，详见Fusion Project  
 
 ### 一、概述   
-Mixin Project是一个AOP框架，实现某些方法的增强。
+Slice Project是一个AOP框架，实现某些方法的增强。
 
 ### 二、使用方式     
 #### 1. 场景描述      

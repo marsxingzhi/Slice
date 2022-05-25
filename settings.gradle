@@ -1,4 +1,4 @@
-rootProject.name = "Mixin"
+rootProject.name = "Slice"
 include ':app'
 include ':mixin-gradle-plugin'
 include ':lib'
