@@ -2,11 +2,11 @@ package com.mars.infra.mixin.gradle.plugin
 
 import com.android.build.api.transform.*
 import com.android.build.gradle.internal.pipeline.TransformManager
-import com.mars.infra.mixin.gradle.plugin.core.Mixin
+import com.mars.infra.mixin.gradle.plugin.core.Slice
 import com.mars.infra.mixin.gradle.plugin.ext.no
 import com.mars.infra.mixin.gradle.plugin.ext.yes
 import com.mars.infra.mixin.gradle.plugin.visitor.MixinClassNode
-import com.mars.infra.mixin.gradle.plugin.visitor.MixinClassVisitor
+import com.mars.infra.mixin.gradle.plugin.visitor.SliceClassVisitor
 import org.apache.commons.codec.digest.DigestUtils
 import org.apache.commons.io.FileUtils
 import org.objectweb.asm.ClassReader
@@ -22,7 +22,7 @@ import java.util.zip.ZipOutputStream
 /**
  * Created by Mars on 2022/3/14
  */
-class MixinTransform : Transform() {
+class SliceTransform : Transform() {
 
     override fun getName(): String = "MixinTransform"
 
@@ -42,8 +42,8 @@ class MixinTransform : Transform() {
             outputProvider.deleteAll()
         }
 
-        Mixin.collectHookInfo(transformInvocation)
-        Mixin.mixinHookClasses.forEach {
+        Slice.collectHookInfo(transformInvocation)
+        Slice.mixinHookClasses.forEach {
             println("mixinHookClasses = $it")
         }
 
@@ -141,14 +141,14 @@ class MixinTransform : Transform() {
      * TODO 未找到原因，暂时将ClassWriter.COMPUTE_FRAMES改成0
      */
     private fun doTransform(classname: String, inputStream: ByteArray): ByteArray? {
-        if (Mixin.mixinHookClasses.contains(classname)) {
+        if (Slice.mixinHookClasses.contains(classname)) {
             println("doTransform---classname = $classname")
             return null
         }
         val cr = ClassReader(inputStream)
         val cw = ClassWriter(cr, 0)
-        val mixinClassVisitor = MixinClassVisitor(cw)
-        val mixinClassNode = MixinClassNode(mixinClassVisitor)
+        val sliceClassVisitor = SliceClassVisitor(cw)
+        val mixinClassNode = MixinClassNode(sliceClassVisitor)
         cr.accept(mixinClassNode, ClassReader.EXPAND_FRAMES)
         return cw.toByteArray()
     }

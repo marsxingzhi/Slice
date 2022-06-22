@@ -6,6 +6,6 @@ import org.objectweb.asm.Opcodes
 /**
  * Created by Mars on 2022/3/14
  */
-class MixinClassVisitor(private val classVisitor: ClassVisitor): ClassVisitor(Opcodes.ASM7, classVisitor) {
+class SliceClassVisitor(private val classVisitor: ClassVisitor): ClassVisitor(Opcodes.ASM7, classVisitor) {
 
 }

@@ -1,13 +1,13 @@
 package com.mars.infra.mixin;
 
-import com.mars.infra.mixin.annotations.Mixin;
+import com.mars.infra.mixin.annotations.Slice;
 import com.mars.infra.mixin.annotations.Proxy;
 
 /**
  * Created by Mars on 2022/3/21
  */
-@Mixin
-class TestMixin1 {
+@Slice
+class TestSlice {
 
     @Proxy(owner = "android.util.Log", name = "i", isStatic = true)
     public static int hookLogI(String tag, String msg) {

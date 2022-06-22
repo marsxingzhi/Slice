@@ -1,9 +1,9 @@
 package com.mars.infra.mixin.gradle.plugin.visitor
 
-import com.mars.infra.mixin.gradle.plugin.core.Mixin
+import com.mars.infra.mixin.gradle.plugin.core.Slice
 import com.mars.infra.mixin.gradle.plugin.ext.ANNOTATION_PROXY
 import com.mars.infra.mixin.gradle.plugin.ext.checkHookMethodExist
-import com.mars.infra.mixin.gradle.plugin.model.MixinData
+import com.mars.infra.mixin.gradle.plugin.model.SliceData
 import com.mars.infra.mixin.gradle.plugin.model.ProxyData
 import org.objectweb.asm.AnnotationVisitor
 import org.objectweb.asm.ClassVisitor
@@ -14,7 +14,7 @@ import org.objectweb.asm.Opcodes
  * Created by Mars on 2022/3/15
  */
 @Deprecated(message = "需要使用tree api拿到Insn")
-class MixinCollectClassVisitor : ClassVisitor(Opcodes.ASM7) {
+class SliceCollectClassVisitor : ClassVisitor(Opcodes.ASM7) {
 
     private var owner: String? = null
 
@@ -55,17 +55,17 @@ class MixinCollectAdapter(private val owner: String?,
         var av = super.visitAnnotation(descriptor, visible)
         if (ANNOTATION_PROXY == descriptor) {
             // 记录hookClass
-            val mixinData = MixinData(owner, methodName, methodDesc)
+            val sliceData = SliceData(owner, methodName, methodDesc)
 //            val proxyData = ProxyData()
 //            Mixin.mixinDataList.add(mixinData)
-            av = MixinCollectAnnotation(av, mixinData)
+            av = MixinCollectAnnotation(av, sliceData)
         }
         return av
     }
 }
 
 class MixinCollectAnnotation(annotationVisitor: AnnotationVisitor?,
-                             private val mixinData: MixinData
+                             private val sliceData: SliceData
 ): AnnotationVisitor(Opcodes.ASM7, annotationVisitor) {
 
     private val proxyData = ProxyData()
@@ -82,10 +82,10 @@ class MixinCollectAnnotation(annotationVisitor: AnnotationVisitor?,
 
     override fun visitEnd() {
         super.visitEnd()
-        mixinData.proxyData = proxyData
-        Mixin.mixinDataList.add(mixinData)
+        sliceData.proxyData = proxyData
+        Slice.sliceDataList.add(sliceData)
         checkHookMethodExist(proxyData.owner!!, proxyData.name!!, {
-            Mixin.mixinDataMap[it] = mixinData
+            Slice.sliceDataMap[it] = sliceData
         }, {
             throw Exception("不能重复hook相同方法")
         })

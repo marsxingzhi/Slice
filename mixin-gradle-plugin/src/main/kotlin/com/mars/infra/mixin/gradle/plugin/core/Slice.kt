@@ -2,11 +2,10 @@ package com.mars.infra.mixin.gradle.plugin.core
 
 import com.android.build.api.transform.JarInput
 import com.android.build.api.transform.TransformInvocation
-import com.mars.infra.mixin.gradle.plugin.core.desugarInstruction
 import com.mars.infra.mixin.gradle.plugin.ext.*
-import com.mars.infra.mixin.gradle.plugin.model.MixinData
+import com.mars.infra.mixin.gradle.plugin.model.SliceData
 import com.mars.infra.mixin.gradle.plugin.model.ProxyData
-import com.mars.infra.mixin.gradle.plugin.visitor.MixinCollectClassVisitor
+import com.mars.infra.mixin.gradle.plugin.visitor.SliceCollectClassVisitor
 import org.objectweb.asm.ClassReader
 import org.objectweb.asm.Opcodes
 import org.objectweb.asm.Type
@@ -20,15 +19,15 @@ import java.util.zip.ZipFile
 /**
  * Created by Mars on 2022/3/15
  */
-object Mixin {
+object Slice {
 
     @Deprecated("存在问题，无法判断是否hook相同的方法")
-    val mixinDataList by lazy {
-        arrayListOf<MixinData>()
+    val sliceDataList by lazy {
+        arrayListOf<SliceData>()
     }
 
-    val mixinDataMap by lazy {
-        hashMapOf<String, MixinData>()
+    val sliceDataMap by lazy {
+        hashMapOf<String, SliceData>()
     }
 
     val mixinHookClasses by lazy {
@@ -36,8 +35,8 @@ object Mixin {
     }
 
     fun clear() {
-        mixinDataList.clear()
-        mixinDataMap.clear()
+        sliceDataList.clear()
+        sliceDataMap.clear()
     }
 
 
@@ -102,7 +101,7 @@ object Mixin {
     private fun collectInternal(inputStream: InputStream) {
         inputStream.use {
             val cr = ClassReader(it.readBytes())
-            val cv = MixinCollectClassVisitor()
+            val cv = SliceCollectClassVisitor()
             cr.accept(cv, ClassReader.EXPAND_FRAMES)
         }
     }
@@ -110,7 +109,7 @@ object Mixin {
     private fun collectInternal(file: File) {
         file.inputStream().use {
             val cr = ClassReader(it.readBytes())
-            val cv = MixinCollectClassVisitor()
+            val cv = SliceCollectClassVisitor()
             cr.accept(cv, ClassReader.SKIP_DEBUG or ClassReader.SKIP_FRAMES)
         }
     }
@@ -122,7 +121,7 @@ private fun ClassNode.handleNode() {
                 && it.access and Opcodes.ACC_NATIVE == 0
                 && it.name != "<init>"
     }.forEach { methodNode ->
-        val mixinData = MixinData(name, methodNode.name, methodNode.desc, methodNode = methodNode)
+        val sliceData = SliceData(name, methodNode.name, methodNode.desc, methodNode = methodNode)
 
         // 只有Proxy注解标识的方法，才是hook方法
         var isHookMethod = false
@@ -150,12 +149,12 @@ private fun ClassNode.handleNode() {
                 realDescriptor += ")"
                 realDescriptor += returnType.descriptor
 
-                mixinData.proxyData = ProxyData(owner, name, realDescriptor, isStatic)
+                sliceData.proxyData = ProxyData(owner, name, realDescriptor, isStatic)
 
-                Mixin.mixinDataList.add(mixinData)
+                Slice.sliceDataList.add(sliceData)
 
                 checkHookMethodExist(owner, name, success = {
-                    Mixin.mixinDataMap[it] = mixinData
+                    Slice.sliceDataMap[it] = sliceData
                 }, error = {
                     throw Exception("${owner}.${name} 方法已经被hook了，不能重复hook")
                 })
@@ -219,7 +218,7 @@ private fun ClassNode.handleNode() {
 
                     if (it.name == "invoke") {
                         val argumentTypes = Type.getArgumentTypes(methodNode.desc)
-                        methodNode.desugarInstruction(argumentTypes, it, mixinData.proxyData!!)
+                        methodNode.desugarInstruction(argumentTypes, it, sliceData.proxyData!!)
                     }
                 }
             }

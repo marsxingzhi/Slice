@@ -7,11 +7,11 @@ import org.gradle.api.Project
 /**
  * Created by Mars on 2022/3/14
  */
-class MixinPlugin: Plugin<Project> {
+class SlicePlugin: Plugin<Project> {
 
     override fun apply(project: Project) {
         println("MixinPlugin---😄")
         val appExtension = project.extensions.getByType(AppExtension::class.java)
-        appExtension.registerTransform(MixinTransform())
+        appExtension.registerTransform(SliceTransform())
     }
 }

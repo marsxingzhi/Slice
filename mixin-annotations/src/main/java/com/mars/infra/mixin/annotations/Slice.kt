@@ -7,4 +7,4 @@ package com.mars.infra.mixin.annotations
  */
 @Target(AnnotationTarget.CLASS)
 @Retention(AnnotationRetention.BINARY)
-annotation class Mixin
+annotation class Slice

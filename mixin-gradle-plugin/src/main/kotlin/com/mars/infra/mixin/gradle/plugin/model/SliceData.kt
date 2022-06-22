@@ -10,7 +10,7 @@ import org.objectweb.asm.tree.MethodNode
  * methodName：superE
  * descriptor: (Ljava/lang/String;Ljava/lang/String;)I
  */
-data class MixinData(
+data class SliceData(
     val owner: String?,
     val methodName: String?,
     val descriptor: String?,

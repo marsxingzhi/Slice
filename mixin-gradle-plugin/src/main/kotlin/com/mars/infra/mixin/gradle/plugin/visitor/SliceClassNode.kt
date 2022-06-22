@@ -1,11 +1,11 @@
 package com.mars.infra.mixin.gradle.plugin.visitor
 
 import com.mars.infra.mixin.gradle.plugin.core.MethodTransformer
-import com.mars.infra.mixin.gradle.plugin.core.Mixin
+import com.mars.infra.mixin.gradle.plugin.core.Slice
 import com.mars.infra.mixin.gradle.plugin.ext.PROXY_INSN_CHAIN_NAME
 import com.mars.infra.mixin.gradle.plugin.ext.buildMixinMethodName
 import com.mars.infra.mixin.gradle.plugin.ext.no
-import com.mars.infra.mixin.gradle.plugin.model.MixinData
+import com.mars.infra.mixin.gradle.plugin.model.SliceData
 import org.objectweb.asm.ClassVisitor
 import org.objectweb.asm.MethodVisitor
 import org.objectweb.asm.Opcodes
@@ -39,18 +39,18 @@ class MixinClassNode(private val classVisitor: ClassVisitor?) : ClassNode(Opcode
     /**
      * 这里新增方法
      */
-    override fun hook(insnNode: MethodInsnNode, mixinData: MixinData) {
+    override fun hook(insnNode: MethodInsnNode, sliceData: SliceData) {
         hasHook.no {
             // 需要判断一下相同方法如果已经添加过了，就不能重复添加。这里判断不准确，应该方法名不一定一致啊
             // 这里好像没有必要再次判断，重复的判断收敛到数据源
-            val flag = "${mixinData.methodName.buildMixinMethodName()}-${mixinData.descriptor}"
+            val flag = "${sliceData.methodName.buildMixinMethodName()}-${sliceData.descriptor}"
             if (hookMethodSet.contains(flag)) {
                 return
             }
             hookMethodSet.add(flag)
             val hookMethodNode = MethodNode(Opcodes.ACC_PRIVATE or Opcodes.ACC_STATIC,
-                mixinData.methodName.buildMixinMethodName(),
-                mixinData.descriptor, null, null)
+                sliceData.methodName.buildMixinMethodName(),
+                sliceData.descriptor, null, null)
             methods.add(hookMethodNode)
 
             /**
@@ -60,7 +60,7 @@ class MixinClassNode(private val classVisitor: ClassVisitor?) : ClassNode(Opcode
              * 这里将hookLogW中的指令写入了_generate_hookLogW_mixin()方法体中，
              * 但是在写入过程中如果遇到MixinProxyInsn.proceed对应的指令需要将LogW对应的方法指令写入（原指令）
              */
-            mixinData.methodNode?.accept(object: MethodVisitor(Opcodes.ASM7, hookMethodNode) {
+            sliceData.methodNode?.accept(object: MethodVisitor(Opcodes.ASM7, hookMethodNode) {
 
                 private var hasInvokeMixinProxyInsn = false
 
@@ -190,7 +190,7 @@ class MixinClassNode(private val classVisitor: ClassVisitor?) : ClassNode(Opcode
 }
 
 private fun MethodInsnNode.handleInsnNode(node: MethodNode, owner: String, iHook: IHook) {
-    Mixin.mixinDataMap.values.forEach { mixinData ->
+    Slice.sliceDataMap.values.forEach { mixinData ->
         val proxyData = mixinData.proxyData
         if (this.owner == proxyData?.owner
             && this.name == proxyData?.name
@@ -204,13 +204,13 @@ private fun MethodInsnNode.handleInsnNode(node: MethodNode, owner: String, iHook
 /**
  * 在MethodNode中使用新指令替换insnNode旧指令
  */
-private fun MethodNode.modify(insnNode: MethodInsnNode, mixinData: MixinData, owner: String) {
+private fun MethodNode.modify(insnNode: MethodInsnNode, sliceData: SliceData, owner: String) {
         val newMethodInsnNode =
             MethodInsnNode(
                 Opcodes.INVOKESTATIC,  // 这里始终是调用静态方法
                 owner,
-                mixinData.methodName.buildMixinMethodName(),
-                mixinData.descriptor,
+                sliceData.methodName.buildMixinMethodName(),
+                sliceData.descriptor,
                 false
             )
     instructions.insert(insnNode, newMethodInsnNode)
@@ -218,5 +218,5 @@ private fun MethodNode.modify(insnNode: MethodInsnNode, mixinData: MixinData, ow
 }
 
 interface IHook {
-    fun hook(insnNode: MethodInsnNode, mixinData: MixinData)
+    fun hook(insnNode: MethodInsnNode, sliceData: SliceData)
 }

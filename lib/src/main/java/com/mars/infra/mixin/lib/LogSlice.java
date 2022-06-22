@@ -2,15 +2,15 @@ package com.mars.infra.mixin.lib;
 
 import android.util.Log;
 
-import com.mars.infra.mixin.annotations.Mixin;
+import com.mars.infra.mixin.annotations.Slice;
 import com.mars.infra.mixin.annotations.Proxy;
-import com.mars.infra.mixin.annotations.MixinProxyInsn;
+import com.mars.infra.mixin.annotations.SliceProxyInsn;
 
 /**
  * Created by Mars on 2022/3/22
  */
-@Mixin
-class LogMixin {
+@Slice
+class LogSlice {
 
     @Proxy(owner = "android.util.Log", name = "e", isStatic = true)
     public static int hookLogE(String tag, String msg) {
@@ -26,7 +26,7 @@ class LogMixin {
      */
     @Proxy(owner = "android.util.Log", name = "w", isStatic = true)
     public static int hookLogW(String tag, String msg) {
-        return (int) MixinProxyInsn.invoke(tag, msg + " ---> LogMixin hookLogW hook success.");
+        return (int) SliceProxyInsn.invoke(tag, msg + " ---> LogMixin hookLogW hook success.");
     }
 
 }

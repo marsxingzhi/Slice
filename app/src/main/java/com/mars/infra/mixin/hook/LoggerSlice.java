@@ -1,14 +1,14 @@
 package com.mars.infra.mixin.hook;
 
-import com.mars.infra.mixin.annotations.Mixin;
+import com.mars.infra.mixin.annotations.Slice;
 import com.mars.infra.mixin.annotations.Proxy;
-import com.mars.infra.mixin.annotations.MixinProxyInsn;
+import com.mars.infra.mixin.annotations.SliceProxyInsn;
 
 /**
  * Created by Mars on 2022/3/24
  */
-@Mixin
-class LoggerMixin {
+@Slice
+class LoggerSlice {
 
 
     /**
@@ -18,7 +18,7 @@ class LoggerMixin {
     public static long hookPrintL(String tag, String msg) {
         long res = -1;
          try {
-             res =  (long) MixinProxyInsn.invoke(tag, msg);
+             res =  (long) SliceProxyInsn.invoke(tag, msg);
          } catch (Exception e) {
              e.printStackTrace();
          }
@@ -29,7 +29,7 @@ class LoggerMixin {
     public static long hookPrintLForce(String tag, String msg) {
         long res = -1;
         try {
-            res =  (long) MixinProxyInsn.invoke(tag, msg + " ---> has hooked success");
+            res =  (long) SliceProxyInsn.invoke(tag, msg + " ---> has hooked success");
         } catch (Exception e) {
             e.printStackTrace();
         }

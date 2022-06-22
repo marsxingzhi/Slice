@@ -36,7 +36,7 @@ package com.mars.infra.mixin.annotations;
  * 因此如果改成方法一，那么就多了两个指令，将这两个指令过滤掉，就不报错了！
  *
  */
-public class MixinProxyInsn {
+public class SliceProxyInsn {
 
     /**
      * 调用原指令
